@@ -72,6 +72,7 @@ export default function Home() {
   const [filter,   setFilter]   = useState('all');
   const [lang,     setLang]     = useState<'en'|'ar'>('en');
   const [mounted,  setMounted]  = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('lang') as 'en'|'ar';
@@ -122,25 +123,65 @@ export default function Home() {
     <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif"}}>
 
       {/* ══ NAV ══ */}
-      <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:1000,padding:'1.1rem 3rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
-        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.3rem',color:T.goldL,fontWeight:700,letterSpacing:1}}>✦ Shaimaa Kalel</span>
-        <div style={{display:'flex',gap:'2rem',alignItems:'center',flexWrap:'wrap'}}>
-          {L.navLinks.map(([h,l]) => (
-            <a key={h} href={h} style={{color:T.text2,textDecoration:'none',fontSize:'1rem',fontWeight:600,transition:'color .2s'}}
-              onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
-              onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>{l}</a>
-          ))}
-          <button onClick={()=>setLang(lang==='en'?'ar':'en')}
-            style={{padding:'.45rem 1.2rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.85rem',fontWeight:700,cursor:'pointer',transition:'all .2s'}}
-            onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(200,158,72,0.2)';}}
-            onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(200,158,72,0.1)';}}>
-            {L.langBtn}
+      <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:1000,background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
+        <div style={{padding:'1.1rem 1.5rem',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700,letterSpacing:1}}>✦ Shaimaa Kalel</span>
+
+          {/* DESKTOP LINKS */}
+          <div className="desktop-nav" style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
+            {L.navLinks.map(([h,l]) => (
+              <a key={h} href={h} style={{color:T.text2,textDecoration:'none',fontSize:'.95rem',fontWeight:600,transition:'color .2s'}}
+                onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
+                onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>{l}</a>
+            ))}
+            <button onClick={()=>setLang(lang==='en'?'ar':'en')}
+              style={{padding:'.4rem 1rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.82rem',fontWeight:700,cursor:'pointer'}}>
+              {L.langBtn}
+            </button>
+            <Link href="/admin/login" style={{padding:'.4rem 1rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.5)`,borderRadius:20,color:T.rose,textDecoration:'none',fontSize:'.82rem',fontWeight:700}}>
+              Admin
+            </Link>
+          </div>
+
+          {/* HAMBURGER */}
+          <button className="hamburger" onClick={()=>setMenuOpen(!menuOpen)}
+            style={{display:'none',flexDirection:'column',gap:5,background:'none',border:'none',cursor:'pointer',padding:4}}>
+            <span style={{width:24,height:2,background:menuOpen?T.gold:T.text2,display:'block',transition:'all .3s',transform:menuOpen?'rotate(45deg) translate(5px,5px)':'none'}}/>
+            <span style={{width:24,height:2,background:menuOpen?T.gold:T.text2,display:'block',transition:'all .3s',opacity:menuOpen?0:1}}/>
+            <span style={{width:24,height:2,background:menuOpen?T.gold:T.text2,display:'block',transition:'all .3s',transform:menuOpen?'rotate(-45deg) translate(5px,-5px)':'none'}}/>
           </button>
-          <Link href="/admin/login" style={{padding:'.45rem 1.2rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.5)`,borderRadius:20,color:T.rose,textDecoration:'none',fontSize:'.85rem',fontWeight:700}}>
-            Admin
-          </Link>
         </div>
+
+        {/* MOBILE MENU */}
+        {menuOpen && (
+          <div style={{padding:'1rem 1.5rem 1.5rem',borderTop:`1px solid ${T.border}`,display:'flex',flexDirection:'column',gap:'.75rem'}}>
+            {L.navLinks.map(([h,l]) => (
+              <a key={h} href={h} onClick={()=>setMenuOpen(false)}
+                style={{color:T.text2,textDecoration:'none',fontSize:'1.05rem',fontWeight:600,padding:'.5rem 0',borderBottom:`1px solid rgba(200,158,72,0.08)`}}>
+                {l}
+              </a>
+            ))}
+            <div style={{display:'flex',gap:'1rem',marginTop:'.5rem'}}>
+              <button onClick={()=>{setLang(lang==='en'?'ar':'en');setMenuOpen(false);}}
+                style={{flex:1,padding:'.6rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:10,color:T.gold,fontSize:'.9rem',fontWeight:700,cursor:'pointer'}}>
+                {L.langBtn}
+              </button>
+              <Link href="/admin/login" onClick={()=>setMenuOpen(false)}
+                style={{flex:1,padding:'.6rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.5)`,borderRadius:10,color:T.rose,textDecoration:'none',fontSize:'.9rem',fontWeight:700,textAlign:'center'}}>
+                Admin
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
+
+      {/* CSS for responsive */}
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .hamburger { display: flex !important; }
+        }
+      `}</style>
 
       {/* ══ HERO ══ */}
       <section style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'9rem 2rem 7rem',position:'relative',overflow:'hidden'}}>
@@ -249,23 +290,18 @@ export default function Home() {
               <h2 style={h2base}>{L.articleTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.articleSpan}</span></h2>
               <div style={rule}/>
             </div>
-            <Link href="/articles" style={{fontSize:'.9rem',color:T.gold,fontWeight:700,textDecoration:'none',transition:'color .2s'}}
+            <Link href="/articles" style={{fontSize:'.9rem',color:T.gold,fontWeight:700,textDecoration:'none'}}
               onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
               onMouseLeave={e=>(e.currentTarget.style.color=T.gold)}>
               {L.viewAll}
             </Link>
           </div>
-
-          {articles.length===0 && (
-            <p style={{color:T.muted,textAlign:'center',padding:'3rem',fontSize:'1rem'}}>{L.noArticles}</p>
-          )}
-
+          {articles.length===0 && <p style={{color:T.muted,textAlign:'center',padding:'3rem',fontSize:'1rem'}}>{L.noArticles}</p>}
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:'1.75rem'}}>
             {articles.map(a=>(
               <Link key={a.id} href={`/articles/${a.id}`} style={{textDecoration:'none',display:'flex',flexDirection:'column',background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden',transition:'all .3s'}}
                 onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.transform='translateY(-6px)';el.style.borderColor='rgba(201,160,72,0.5)';el.style.boxShadow='0 24px 60px rgba(0,0,0,0.6)';}}
                 onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.transform='translateY(0)';el.style.borderColor=T.border;el.style.boxShadow='none';}}>
-                {/* COVER */}
                 <div style={{height:130,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
                   <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(${T.border} 1px,transparent 1px),linear-gradient(90deg,${T.border} 1px,transparent 1px)`,backgroundSize:'35px 35px',opacity:.3}}/>
                   <span style={{fontFamily:'Playfair Display,serif',fontSize:'2rem',color:'rgba(255,255,255,0.12)',fontWeight:900,position:'relative',zIndex:1}}>✦</span>
