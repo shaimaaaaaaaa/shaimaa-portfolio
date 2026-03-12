@@ -26,7 +26,7 @@ const LANG = {
     email:'Email Address', linkedin:'LinkedIn URL', github:'GitHub URL',
     instagram:'Instagram URL', tiktok:'TikTok URL',
     whatsapp:'WhatsApp Number (e.g. 971501234567)',
-    saving:'Saving...', save:'Save Settings ✦', saved:'✓ Saved successfully!',
+    saving:'Saving...', save:'Save Settings ♥', saved:'✓ Saved successfully!',
   },
   ar: {
     langBtn:'English', dir:'rtl',
@@ -40,7 +40,7 @@ const LANG = {
     email:'البريد الإلكتروني', linkedin:'رابط LinkedIn', github:'رابط GitHub',
     instagram:'رابط Instagram', tiktok:'رابط TikTok',
     whatsapp:'رقم الواتساب (مثال: 971501234567)',
-    saving:'جاري الحفظ...', save:'حفظ الإعدادات ✦', saved:'✓ تم الحفظ بنجاح!',
+    saving:'جاري الحفظ...', save:'حفظ الإعدادات ♥', saved:'✓ تم الحفظ بنجاح!',
   },
 };
 
@@ -120,8 +120,8 @@ export default function AdminSettings() {
       <div style={{position:'fixed',width:600,height:600,borderRadius:'50%',background:'radial-gradient(circle,rgba(138,31,50,0.3) 0%,transparent 65%)',top:-200,right:-150,pointerEvents:'none',zIndex:0}}/>
 
       {/* NAV */}
-      <nav style={{position:'sticky',top:0,zIndex:100,padding:'1rem 3rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`}}>
-        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>✦ Admin Panel</span>
+      <nav style={{position:'sticky',top:0,zIndex:100,padding:'1rem 2rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`}}>
+        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>♥ Admin Panel</span>
         <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
           <button onClick={()=>setLang(lang==='en'?'ar':'en')}
             style={{padding:'.4rem 1rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.82rem',fontWeight:700,cursor:'pointer'}}>
