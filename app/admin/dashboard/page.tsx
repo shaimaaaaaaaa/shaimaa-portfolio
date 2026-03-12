@@ -18,11 +18,12 @@ const LANG = {
     eyebrow:'dashboard', welcome:'Welcome Back,', name:'Shaimaa',
     viewSite:'View Site', signOut:'Sign Out',
     sections:[
-      { href:'/admin/projects',  icon:'▣', label:'Projects',  sub:'Add, edit, and remove projects' },
-      { href:'/admin/courses',   icon:'◈', label:'Courses',   sub:'Manage video lessons and quizzes' },
-      { href:'/admin/articles',  icon:'✍', label:'Articles',  sub:'Write and manage blog posts' },
-      { href:'/admin/messages',  icon:'◉', label:'Messages',  sub:'View contact form submissions' },
-      { href:'/admin/settings',  icon:'◎', label:'Settings',  sub:'Update profile and site info' },
+      { href:'/admin/projects', icon:'♡', label:'Projects',  sub:'Add, edit, and remove projects' },
+      { href:'/admin/courses',  icon:'♡', label:'Courses',   sub:'Manage video lessons and quizzes' },
+      { href:'/admin/articles', icon:'♡', label:'Articles',  sub:'Write and manage blog posts' },
+      { href:'/admin/about',    icon:'♡', label:'About Page',sub:'Edit bio, education, certs & skills' },
+      { href:'/admin/messages', icon:'♡', label:'Messages',  sub:'View contact form submissions' },
+      { href:'/admin/settings', icon:'♡', label:'Settings',  sub:'Update profile and site info' },
     ],
   },
   ar: {
@@ -30,11 +31,12 @@ const LANG = {
     eyebrow:'لوحة التحكم', welcome:'أهلاً،', name:'شيماء',
     viewSite:'عرض الموقع', signOut:'تسجيل الخروج',
     sections:[
-      { href:'/admin/projects',  icon:'▣', label:'المشاريع',  sub:'إضافة وتعديل وحذف المشاريع' },
-      { href:'/admin/courses',   icon:'◈', label:'الكورسات',  sub:'إدارة الدروس والكويز' },
-      { href:'/admin/articles',  icon:'✍', label:'المقالات',  sub:'كتابة وإدارة المقالات' },
-      { href:'/admin/messages',  icon:'◉', label:'الرسائل',   sub:'عرض رسائل نموذج التواصل' },
-      { href:'/admin/settings',  icon:'◎', label:'الإعدادات', sub:'تحديث الملف الشخصي ومعلومات الموقع' },
+      { href:'/admin/projects', icon:'♡', label:'المشاريع',   sub:'إضافة وتعديل وحذف المشاريع' },
+      { href:'/admin/courses',  icon:'♡', label:'الكورسات',   sub:'إدارة الدروس والكويز' },
+      { href:'/admin/articles', icon:'♡', label:'المقالات',   sub:'كتابة وإدارة المقالات' },
+      { href:'/admin/about',    icon:'♡', label:'صفحة عني',   sub:'تعديل النبذة والتعليم والشهادات' },
+      { href:'/admin/messages', icon:'♡', label:'الرسائل',    sub:'عرض رسائل نموذج التواصل' },
+      { href:'/admin/settings', icon:'♡', label:'الإعدادات',  sub:'تحديث الملف الشخصي ومعلومات الموقع' },
     ],
   },
 };
@@ -79,17 +81,19 @@ export default function Dashboard() {
       <div style={{position:'fixed',width:600,height:600,borderRadius:'50%',background:'radial-gradient(circle,rgba(138,31,50,0.3) 0%,transparent 65%)',top:-200,right:-150,pointerEvents:'none',zIndex:0}}/>
 
       {/* NAV */}
-      <nav style={{position:'sticky',top:0,zIndex:100,padding:'1.1rem 3rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
-        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.3rem',color:T.goldL,fontWeight:700,letterSpacing:1}}>✦ Admin Panel</span>
-        <div style={{display:'flex',alignItems:'center',gap:'1.5rem'}}>
-          <span style={{fontSize:'.85rem',color:T.muted}}>{email}</span>
+      <nav style={{position:'sticky',top:0,zIndex:100,padding:'1.1rem 2rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
+        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700,letterSpacing:1}}>♥ Admin Panel</span>
+        <div style={{display:'flex',alignItems:'center',gap:'1.25rem',flexWrap:'wrap'}}>
+          <span style={{fontSize:'.82rem',color:T.muted}}>{email}</span>
           <button onClick={()=>setLang(lang==='en'?'ar':'en')}
-            style={{padding:'.4rem 1rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.82rem',fontWeight:700,cursor:'pointer'}}>
+            style={{padding:'.38rem .9rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.8rem',fontWeight:700,cursor:'pointer'}}>
             {L.langBtn}
           </button>
-          <Link href="/" style={{fontSize:'.85rem',color:T.text2,textDecoration:'none',fontWeight:600}} onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)} onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>{L.viewSite}</Link>
+          <Link href="/" style={{fontSize:'.82rem',color:T.text2,textDecoration:'none',fontWeight:600}}
+            onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
+            onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>{L.viewSite}</Link>
           <button onClick={()=>signOut(auth).then(()=>router.push('/admin/login'))}
-            style={{padding:'.45rem 1.2rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.5)`,borderRadius:20,color:T.rose,fontSize:'.85rem',fontWeight:700,cursor:'pointer'}}>
+            style={{padding:'.38rem .9rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.5)`,borderRadius:20,color:T.rose,fontSize:'.8rem',fontWeight:700,cursor:'pointer'}}>
             {L.signOut}
           </button>
         </div>
@@ -98,23 +102,28 @@ export default function Dashboard() {
       <div style={{maxWidth:1000,margin:'0 auto',padding:'4rem 2rem',position:'relative',zIndex:1}}>
         <div style={{marginBottom:'3.5rem'}}>
           <span style={{fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'}}>{L.eyebrow}</span>
-          <h1 style={{fontFamily:'Playfair Display,serif',fontSize:'2.6rem',fontWeight:900,color:T.white}}>
-            {L.welcome} <span style={{color:T.goldL,fontStyle:'italic'}}>{L.name}</span>
+          <h1 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.8rem,4vw,2.6rem)',fontWeight:900,color:T.white}}>
+            {L.welcome} <span style={{color:T.goldL,fontStyle:'italic'}}>{L.name}</span> <span style={{color:T.rose}}>♥</span>
           </h1>
           <div style={{width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`}}/>
         </div>
 
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:'1.5rem'}}>
           {L.sections.map(({href,icon,label,sub}) => (
-            <Link key={href} href={href} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'2rem',textDecoration:'none',display:'flex',flexDirection:'column',gap:'.75rem',transition:'all .3s'}}
+            <Link key={href} href={href}
+              style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'2rem',textDecoration:'none',display:'flex',flexDirection:'column',gap:'.75rem',transition:'all .3s',position:'relative',overflow:'hidden'}}
               onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor='rgba(201,160,72,0.5)';el.style.transform='translateY(-5px)';el.style.boxShadow='0 20px 50px rgba(0,0,0,0.5)';}}
               onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor=T.border;el.style.transform='translateY(0)';el.style.boxShadow='none';}}>
-              <div style={{width:48,height:48,borderRadius:12,background:'rgba(138,31,50,0.35)',border:`1px solid ${T.border}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.4rem',color:T.goldL}}>
+              {/* About badge */}
+              {href==='/admin/about' && (
+                <span style={{position:'absolute',top:12,right:12,fontSize:'.6rem',background:'rgba(138,31,50,0.4)',border:`1px solid rgba(208,112,128,0.4)`,borderRadius:10,padding:'.2rem .5rem',color:T.rose,fontWeight:700,letterSpacing:1}}>NEW</span>
+              )}
+              <div style={{width:48,height:48,borderRadius:12,background:'rgba(138,31,50,0.35)',border:`1px solid ${T.border}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',color:T.rose}}>
                 {icon}
               </div>
               <div>
-                <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.1rem',fontWeight:700,color:T.white,marginBottom:'.3rem'}}>{label}</div>
-                <div style={{fontSize:'.82rem',color:T.muted,lineHeight:1.6}}>{sub}</div>
+                <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.05rem',fontWeight:700,color:T.white,marginBottom:'.3rem'}}>{label}</div>
+                <div style={{fontSize:'.8rem',color:T.muted,lineHeight:1.6}}>{sub}</div>
               </div>
             </Link>
           ))}
