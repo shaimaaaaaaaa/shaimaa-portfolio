@@ -15,7 +15,7 @@ const T = {
 
 const LANG = {
   en: {
-    title:'Manage', span:'Courses', addCourse:'Add New Course ✦',
+    title:'Manage', span:'Courses', addCourse:'Add New Course ♥',
     noLessons:'No courses yet.', lessons:'lessons', addLesson:'+ Lesson',
     edit:'Edit', delete:'Delete', questions:'questions',
     back:'Back', dashboard:'Dashboard',
@@ -25,11 +25,11 @@ const LANG = {
     course:'Course', lessonTitle:'Lesson title *', youtubeUrl:'YouTube URL *',
     quizBuilder:'Quiz Builder', question:'Question', correctAnswer:'Correct answer:',
     option:'Option', addQuestion:'Add Question', remove:'Remove',
-    saving:'Saving...', saveChanges:'Save Changes ✦', createCourse:'Create Course ✦', saveLesson:'Save Lesson ✦',
+    saving:'Saving...', saveChanges:'Save Changes ♥', createCourse:'Create Course ♥', saveLesson:'Save Lesson ♥',
     dir:'ltr', langBtn:'العربية',
   },
   ar: {
-    title:'إدارة', span:'الكورسات', addCourse:'إضافة كورس جديد ✦',
+    title:'إدارة', span:'الكورسات', addCourse:'إضافة كورس جديد ♥',
     noLessons:'لا يوجد كورسات بعد.', lessons:'درس', addLesson:'+ درس',
     edit:'تعديل', delete:'حذف', questions:'أسئلة',
     back:'رجوع', dashboard:'لوحة التحكم',
@@ -39,7 +39,7 @@ const LANG = {
     course:'الكورس', lessonTitle:'عنوان الدرس *', youtubeUrl:'رابط YouTube *',
     quizBuilder:'بناء الكويز', question:'السؤال', correctAnswer:'الإجابة الصحيحة:',
     option:'خيار', addQuestion:'إضافة سؤال', remove:'حذف',
-    saving:'جاري الحفظ...', saveChanges:'حفظ التغييرات ✦', createCourse:'إنشاء الكورس ✦', saveLesson:'حفظ الدرس ✦',
+    saving:'جاري الحفظ...', saveChanges:'حفظ التغييرات ♥', createCourse:'إنشاء الكورس ♥', saveLesson:'حفظ الدرس ♥',
     dir:'rtl', langBtn:'English',
   },
 };
@@ -169,7 +169,7 @@ export default function AdminCourses() {
 
       {/* NAV */}
       <nav style={{position:'sticky',top:0,zIndex:100,padding:'1rem 3rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`}}>
-        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>✦ Admin Panel</span>
+        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>♥ Admin Panel</span>
         <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
           {step!=='list' && (
             <button onClick={()=>{setStep('list');setEditingLessonIdx(null);}}

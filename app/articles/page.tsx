@@ -97,7 +97,7 @@ export default function ArticlesPage() {
         {/* NAV */}
         <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:1000,background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
           <div style={{padding:'.9rem 1.5rem',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-            <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,fontWeight:700,letterSpacing:1,textDecoration:'none',flexShrink:0}}>✦ Shaimaa Kalel</Link>
+            <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,fontWeight:700,letterSpacing:1,textDecoration:'none',flexShrink:0}}>♥ Shaimaa Kalel</Link>
 
             {/* DESKTOP */}
             <div className="art-desktop" style={{gap:'1.5rem',alignItems:'center'}}>
@@ -167,7 +167,7 @@ export default function ArticlesPage() {
               <Link key={a.id} href={`/articles/${a.id}`} style={{textDecoration:'none',display:'flex',flexDirection:'column',background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:'hidden',transition:'all .3s'}}>
                 <div style={{height:150,background:a.coverColor||`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
                   <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(${T.border} 1px,transparent 1px),linear-gradient(90deg,${T.border} 1px,transparent 1px)`,backgroundSize:'40px 40px',opacity:.3}}/>
-                  <span style={{fontFamily:'Playfair Display,serif',fontSize:'2.2rem',color:'rgba(255,255,255,0.15)',fontWeight:900,position:'relative',zIndex:1}}>✦</span>
+                  <span style={{fontFamily:'Playfair Display,serif',fontSize:'2.2rem',color:'rgba(255,255,255,0.15)',fontWeight:900,position:'relative',zIndex:1}}>♥</span>
                 </div>
                 <div style={{padding:'1.4rem',flex:1,display:'flex',flexDirection:'column'}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'.65rem'}}>

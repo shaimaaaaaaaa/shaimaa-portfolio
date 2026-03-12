@@ -17,14 +17,14 @@ const LANG = {
   en: {
     langBtn:'العربية', dir:'ltr',
     eyebrow:'admin panel', title:'Manage', span:'Articles',
-    dashboard:'Dashboard', addNew:'Add New Article ✦',
+    dashboard:'Dashboard', addNew:'Add New Article ♥',
     noArticles:'No articles yet.',
     newArticle:'New Article', editArticle:'Edit Article',
     titleEn:'Title (English) *', titleAr:'Title (Arabic)',
     excerptEn:'Excerpt (English) *', excerptAr:'Excerpt (Arabic)',
     contentEn:'Content (English) *', contentAr:'Content (Arabic)',
     readTime:'Read Time (minutes)', category:'Category',
-    saving:'Saving...', saveChanges:'Save Changes ✦', addArticle:'Publish Article ✦',
+    saving:'Saving...', saveChanges:'Save Changes ♥', addArticle:'Publish Article ♥',
     cancel:'Cancel', edit:'Edit', delete:'Delete', view:'View →',
     minRead:'min read', likes:'likes',
     categories:[
@@ -36,14 +36,14 @@ const LANG = {
   ar: {
     langBtn:'English', dir:'rtl',
     eyebrow:'لوحة التحكم', title:'إدارة', span:'المقالات',
-    dashboard:'لوحة التحكم', addNew:'إضافة مقال جديد ✦',
+    dashboard:'لوحة التحكم', addNew:'إضافة مقال جديد ♥',
     noArticles:'لا توجد مقالات بعد.',
     newArticle:'مقال جديد', editArticle:'تعديل المقال',
     titleEn:'العنوان (إنجليزي) *', titleAr:'العنوان (عربي)',
     excerptEn:'المقتطف (إنجليزي) *', excerptAr:'المقتطف (عربي)',
     contentEn:'المحتوى (إنجليزي) *', contentAr:'المحتوى (عربي)',
     readTime:'وقت القراءة (دقائق)', category:'التصنيف',
-    saving:'جاري الحفظ...', saveChanges:'حفظ التغييرات ✦', addArticle:'نشر المقال ✦',
+    saving:'جاري الحفظ...', saveChanges:'حفظ التغييرات ♥', addArticle:'نشر المقال ♥',
     cancel:'إلغاء', edit:'تعديل', delete:'حذف', view:'عرض →',
     minRead:'دقيقة قراءة', likes:'إعجاب',
     categories:[
@@ -157,7 +157,7 @@ export default function AdminArticles() {
 
       {/* NAV */}
       <nav style={{position:'sticky',top:0,zIndex:100,padding:'1rem 3rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`}}>
-        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>✦ Admin Panel</span>
+        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>♥ Admin Panel</span>
         <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
           <button onClick={()=>setLang(lang==='en'?'ar':'en')}
             style={{padding:'.4rem 1rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.82rem',fontWeight:700,cursor:'pointer'}}>

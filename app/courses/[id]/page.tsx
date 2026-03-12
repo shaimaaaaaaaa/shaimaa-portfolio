@@ -144,7 +144,7 @@ export default function CoursePage() {
 
       {/* NAV */}
       <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,padding:'.85rem 1.25rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
-        <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.1rem',color:T.goldL,textDecoration:'none',fontWeight:700}}>✦ Shaimaa Kalel</Link>
+        <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.1rem',color:T.goldL,textDecoration:'none',fontWeight:700}}>♥ Shaimaa Kalel</Link>
         <Link href="/#courses" style={{fontSize:'.85rem',color:T.text2,textDecoration:'none',fontWeight:600}}
           onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
           onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>
@@ -258,7 +258,7 @@ export default function CoursePage() {
                         {!done && answers[key]!==undefined && (
                           <button onClick={()=>setSubmitted({...submitted,[key]:true})}
                             style={{marginTop:'1rem',padding:'.6rem 1.4rem',background:`linear-gradient(135deg,${T.burg},#4a0f1c)`,color:T.white,border:'none',borderRadius:8,fontSize:'.88rem',fontWeight:700,cursor:'pointer',boxShadow:`0 4px 16px rgba(138,31,50,0.4)`}}>
-                            Check Answer ✦
+                            Check Answer ♥
                           </button>
                         )}
                         {done && (

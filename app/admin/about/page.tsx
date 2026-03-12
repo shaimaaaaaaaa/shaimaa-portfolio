@@ -35,7 +35,7 @@ const LANG = {
     addCert:'+ Add Certification',
     catEnL:'Category (English)', catArL:'Category (Arabic)',
     itemsL:'Skills (comma separated)', addSkill:'+ Add Skill Category',
-    saving:'Saving...', save:'Save All Changes ✦', saved:'✓ Saved!',
+    saving:'Saving...', save:'Save All Changes ♥', saved:'✓ Saved!',
   },
   ar: { langBtn:'English', dir:'rtl',
     title:'تعديل', span:'صفحة عني',
@@ -55,7 +55,7 @@ const LANG = {
     addCert:'+ إضافة شهادة',
     catEnL:'الفئة (إنجليزي)', catArL:'الفئة (عربي)',
     itemsL:'المهارات (مفصولة بفاصلة)', addSkill:'+ إضافة فئة مهارات',
-    saving:'جاري الحفظ...', save:'حفظ كل التغييرات ✦', saved:'✓ تم الحفظ!',
+    saving:'جاري الحفظ...', save:'حفظ كل التغييرات ♥', saved:'✓ تم الحفظ!',
   },
 };
 
@@ -219,7 +219,7 @@ export default function AdminAbout() {
 
       {/* NAV */}
       <nav style={{position:'sticky',top:0,zIndex:100,padding:'1rem 2rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`}}>
-        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,fontWeight:700}}>✦ Admin Panel</span>
+        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,fontWeight:700}}>♥ Admin Panel</span>
         <div style={{display:'flex',gap:'1.25rem',alignItems:'center'}}>
           <button onClick={()=>setLang(lang==='en'?'ar':'en')}
             style={{padding:'.38rem .9rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.8rem',fontWeight:700,cursor:'pointer'}}>

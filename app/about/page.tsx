@@ -150,7 +150,7 @@ export default function AboutPage() {
         {/* NAV */}
         <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:1000,background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
           <div style={{padding:'.9rem 1.5rem',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-            <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,textDecoration:'none',fontWeight:700,flexShrink:0}}>✦ Shaimaa Kalel</Link>
+            <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,textDecoration:'none',fontWeight:700,flexShrink:0}}>♥ Shaimaa Kalel</Link>
             <div className="ab-desktop" style={{gap:'1.4rem',alignItems:'center'}}>
               {L.nav.map(([h,l])=>(
                 <a key={h} href={h} style={{color:T.text2,textDecoration:'none',fontSize:'.88rem',fontWeight:600,whiteSpace:'nowrap',transition:'color .2s'}}

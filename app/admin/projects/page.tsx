@@ -17,13 +17,13 @@ const LANG = {
   en: {
     langBtn:'العربية', dir:'ltr',
     eyebrow:'admin panel', title:'Manage', span:'Projects',
-    dashboard:'Dashboard', addNew:'Add New Project ✦',
+    dashboard:'Dashboard', addNew:'Add New Project ♥',
     noProjects:'No projects yet.',
     newProject:'New Project', editProject:'Edit Project',
     titlePlaceholder:'Project title *', stackPlaceholder:'Stack (Next.js, Laravel...)',
     githubPlaceholder:'GitHub URL', demoPlaceholder:'Demo URL',
     descPlaceholder:'Project description',
-    saving:'Saving...', saveChanges:'Save Changes ✦', addProject:'Add Project ✦',
+    saving:'Saving...', saveChanges:'Save Changes ♥', addProject:'Add Project ♥',
     cancel:'Cancel', edit:'Edit', delete:'Delete',
     categories:[
       {value:'web',   label:'Web Development'},
@@ -36,13 +36,13 @@ const LANG = {
   ar: {
     langBtn:'English', dir:'rtl',
     eyebrow:'لوحة التحكم', title:'إدارة', span:'المشاريع',
-    dashboard:'لوحة التحكم', addNew:'إضافة مشروع جديد ✦',
+    dashboard:'لوحة التحكم', addNew:'إضافة مشروع جديد ♥',
     noProjects:'لا يوجد مشاريع بعد.',
     newProject:'مشروع جديد', editProject:'تعديل المشروع',
     titlePlaceholder:'عنوان المشروع *', stackPlaceholder:'التقنيات (Next.js, Laravel...)',
     githubPlaceholder:'رابط GitHub', demoPlaceholder:'رابط Demo',
     descPlaceholder:'وصف المشروع',
-    saving:'جاري الحفظ...', saveChanges:'حفظ التغييرات ✦', addProject:'إضافة المشروع ✦',
+    saving:'جاري الحفظ...', saveChanges:'حفظ التغييرات ♥', addProject:'إضافة المشروع ♥',
     cancel:'إلغاء', edit:'تعديل', delete:'حذف',
     categories:[
       {value:'web',      label:'Web Development'},
@@ -137,7 +137,7 @@ export default function AdminProjects() {
 
       {/* NAV */}
       <nav style={{position:'sticky',top:0,zIndex:100,padding:'1rem 3rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`}}>
-        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>✦ Admin Panel</span>
+        <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.goldL,fontWeight:700}}>♥ Admin Panel</span>
         <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
           <button onClick={()=>setLang(lang==='en'?'ar':'en')}
             style={{padding:'.4rem 1rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.82rem',fontWeight:700,cursor:'pointer'}}>
