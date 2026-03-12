@@ -24,6 +24,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 html, body {
@@ -41,3 +42,253 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #1a0a0e; }
 ::-webkit-scrollbar-thumb { background: #8c2438; border-radius: 2px; }
+
+/* ══════════════════════════════
+   RESPONSIVE UTILITIES
+══════════════════════════════ */
+
+/* NAV */
+@media (max-width: 768px) {
+  .desktop-nav { display: none !important; }
+  .hamburger   { display: flex !important; }
+}
+@media (min-width: 769px) {
+  .hamburger   { display: none !important; }
+  .desktop-nav { display: flex !important; }
+}
+
+/* ══════════════════════════════
+   TYPOGRAPHY SCALE
+══════════════════════════════ */
+
+/* Hero h1 */
+@media (max-width: 480px) {
+  h1 { font-size: clamp(2rem, 8vw, 3rem) !important; }
+}
+
+/* Section headings */
+@media (max-width: 480px) {
+  h2 { font-size: 1.8rem !important; }
+}
+@media (max-width: 768px) and (min-width: 481px) {
+  h2 { font-size: 2rem !important; }
+}
+
+/* ══════════════════════════════
+   SECTIONS PADDING
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  section {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+@media (max-width: 768px) and (min-width: 481px) {
+  section {
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+}
+
+/* ══════════════════════════════
+   HERO SECTION
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  /* Hero padding top to clear fixed nav */
+  section:first-of-type {
+    padding-top: 7rem !important;
+    padding-bottom: 4rem !important;
+  }
+
+  /* Stats row */
+  .hero-stats {
+    gap: 1.5rem !important;
+  }
+  .hero-stats > div > div:first-child {
+    font-size: 1.6rem !important;
+  }
+
+  /* CTA buttons */
+  .hero-btns a {
+    width: 100%;
+    text-align: center;
+    padding: .8rem 1.2rem !important;
+    font-size: .95rem !important;
+  }
+}
+
+@media (max-width: 768px) and (min-width: 481px) {
+  section:first-of-type {
+    padding-top: 8rem !important;
+  }
+}
+
+/* ══════════════════════════════
+   CARDS GRID
+══════════════════════════════ */
+
+/* Projects, Courses, Articles */
+@media (max-width: 480px) {
+  [style*="minmax(300px"] ,
+  [style*="minmax(290px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) and (min-width: 481px) {
+  [style*="minmax(300px"] ,
+  [style*="minmax(290px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ══════════════════════════════
+   FILTERS ROW
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  .filters-row {
+    gap: .4rem !important;
+  }
+  .filters-row button {
+    padding: .4rem .8rem !important;
+    font-size: .78rem !important;
+  }
+}
+
+/* ══════════════════════════════
+   CONTACT SOCIAL LINKS
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  .social-links {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .social-links a {
+    justify-content: center !important;
+  }
+}
+
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  footer {
+    font-size: .75rem !important;
+    padding: 1.5rem 1rem !important;
+    line-height: 1.8 !important;
+  }
+}
+
+/* ══════════════════════════════
+   ADMIN PAGES
+══════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* Admin nav */
+  nav > div:last-child {
+    gap: .75rem !important;
+  }
+  /* Admin cards grid */
+  [style*="minmax(220px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  [style*="minmax(220px"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* Admin heading */
+  h1[style*="2.6rem"] {
+    font-size: 1.8rem !important;
+  }
+}
+
+/* ══════════════════════════════
+   ARTICLE PAGE
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  /* Article content */
+  article, .article-content {
+    font-size: .95rem !important;
+    line-height: 2 !important;
+  }
+  /* Share buttons */
+  .share-row {
+    flex-wrap: wrap !important;
+    gap: .5rem !important;
+  }
+}
+
+/* ══════════════════════════════
+   COURSES PAGE
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  /* Video embed */
+  iframe {
+    height: 220px !important;
+  }
+  /* Quiz options */
+  .quiz-option {
+    font-size: .9rem !important;
+    padding: .75rem 1rem !important;
+  }
+}
+
+/* ══════════════════════════════
+   ABOUT PAGE
+══════════════════════════════ */
+
+@media (max-width: 480px) {
+  .about-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ══════════════════════════════
+   GENERAL TOUCH IMPROVEMENTS
+══════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* Bigger tap targets */
+  button, a {
+    min-height: 40px;
+  }
+
+  /* Disable hover transforms on touch */
+  *:hover {
+    transform: none !important;
+  }
+
+  /* Prevent text overflow */
+  p, div, span {
+    word-break: break-word;
+  }
+}
+
+/* ══════════════════════════════
+   TABLET (769px - 1024px)
+══════════════════════════════ */
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  section {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+
+  [style*="minmax(300px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
