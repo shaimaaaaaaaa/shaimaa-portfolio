@@ -97,7 +97,7 @@ export default function ProjectsPage() {
                 {/* IMAGE or gradient placeholder */}
                 {p.imageUrl ? (
                   <div style={{height:180,overflow:'hidden'}}>
-                    <img src={p.imageUrl} alt={p.title} style={{width:'100%',height:'100%',objectFit:'cover',display:'block',transition:'transform .4s'}}
+                    <img src={p.imageUrl} alt={p.title} style={{width:'100%',height:'100%',objectFit:'contain',display:'block',background:'#0e0608',transition:'transform .4s'}}
                       onMouseEnter={e=>(e.currentTarget.style.transform='scale(1.05)')}
                       onMouseLeave={e=>(e.currentTarget.style.transform='scale(1)')}/>
                   </div>
