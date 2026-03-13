@@ -40,7 +40,7 @@ export default function AdminLogin() {
       <div style={{width:'100%',maxWidth:440,position:'relative',zIndex:1}}>
         {/* logo */}
         <div style={{textAlign:'center',marginBottom:'2.5rem'}}>
-          <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.5rem',color:T.goldL,fontWeight:700,letterSpacing:1,marginBottom:'.5rem'}}>✦ Shaimaa Kalel</div>
+          <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.5rem',color:T.goldL,fontWeight:700,letterSpacing:1,marginBottom:'.5rem'}}>♥ Shaimaa Kalel</div>
           <div style={{fontSize:'.72rem',letterSpacing:4,textTransform:'uppercase',color:T.muted}}>Admin Panel</div>
         </div>
 
@@ -75,7 +75,7 @@ export default function AdminLogin() {
 
             <button type="submit" disabled={loading}
               style={{marginTop:'.5rem',padding:'1rem',background:`linear-gradient(135deg,${T.burgL},#4a0f1c)`,color:T.white,border:'none',borderRadius:10,fontSize:'1rem',fontWeight:700,cursor:loading?'not-allowed':'pointer',transition:'all .25s',boxShadow:`0 6px 24px rgba(138,31,50,0.45)`,opacity:loading?.6:1}}>
-              {loading ? 'Signing in...' : 'Sign In ✦'}
+              {loading ? 'Signing in...' : 'Sign In ♥'}
             </button>
           </form>
         </div>
