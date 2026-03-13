@@ -8,9 +8,9 @@ import ContactForm from './ContactForm';
 // ═══════════════════════════════
 //  COURSES
 // ═══════════════════════════════
-interface CoursesProps { L: LangData; lang: Lang; courses: Course[]; }
+interface CoursesProps { L: LangData; lang: Lang; courses: Course[]; showViewAll?: boolean; }
 
-export function CoursesSection({ L, courses }: CoursesProps) {
+export function CoursesSection({ L, lang, courses, showViewAll = false }: CoursesProps) {
   const eyebrow: React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
 
   return (
