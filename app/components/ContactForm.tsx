@@ -45,6 +45,11 @@ export default function ContactForm({ lang='en' }: { lang?:'en'|'ar' }) {
     borderRadius:10, color:T.text,
     fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",
     fontSize:'.95rem', outline:'none', transition:'border-color .2s',
+    boxSizing:'border-box',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize:'.78rem', color:T.text2, fontWeight:600, letterSpacing:.5,
   };
 
   if (sent) return (
@@ -56,33 +61,50 @@ export default function ContactForm({ lang='en' }: { lang?:'en'|'ar' }) {
 
   return (
     <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
-        <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
-          <label style={{fontSize:'.78rem',color:T.text2,fontWeight:600,letterSpacing:.5}}>{tx.name.toUpperCase()}</label>
-          <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})}
-            placeholder={tx.name} required style={inp}
-            onFocus={e=>(e.target.style.borderColor=T.gold)}
-            onBlur={e=>(e.target.style.borderColor=T.border)}/>
-        </div>
-        <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
-          <label style={{fontSize:'.78rem',color:T.text2,fontWeight:600,letterSpacing:.5}}>{tx.email.toUpperCase()}</label>
-          <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}
-            placeholder={tx.email} required style={inp}
-            onFocus={e=>(e.target.style.borderColor=T.gold)}
-            onBlur={e=>(e.target.style.borderColor=T.border)}/>
-        </div>
-      </div>
+
+      {/* NAME — full width */}
       <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
-        <label style={{fontSize:'.78rem',color:T.text2,fontWeight:600,letterSpacing:.5}}>{tx.msg.toUpperCase()}</label>
+        <label style={labelStyle}>{tx.name.toUpperCase()}</label>
+        <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})}
+          placeholder={tx.name} required style={inp}
+          onFocus={e=>(e.target.style.borderColor=T.gold)}
+          onBlur={e=>(e.target.style.borderColor=T.border)}/>
+      </div>
+
+      {/* EMAIL — full width */}
+      <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
+        <label style={labelStyle}>{tx.email.toUpperCase()}</label>
+        <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}
+          placeholder={tx.email} required style={{...inp,direction:'ltr'}}
+          onFocus={e=>(e.target.style.borderColor=T.gold)}
+          onBlur={e=>(e.target.style.borderColor=T.border)}/>
+      </div>
+
+      {/* MESSAGE */}
+      <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
+        <label style={labelStyle}>{tx.msg.toUpperCase()}</label>
         <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})}
           placeholder={tx.msg} required rows={5}
           style={{...inp,resize:'vertical'}}
           onFocus={e=>(e.target.style.borderColor=T.gold)}
           onBlur={e=>(e.target.style.borderColor=T.border)}/>
       </div>
-      {error && <p style={{color:T.rose,fontSize:'.88rem'}}>{error}</p>}
+
+      {error && <p style={{color:T.rose,fontSize:'.88rem',margin:0}}>{error}</p>}
+
+      {/* BUTTON — full width */}
       <button type="submit" disabled={sending}
-        style={{padding:'1rem 2.5rem',background:`linear-gradient(135deg,${T.burgL},#4a0f1c)`,color:T.white,border:'none',borderRadius:10,fontWeight:700,fontSize:'1rem',cursor:sending?'not-allowed':'pointer',opacity:sending?.7:1,boxShadow:`0 6px 24px rgba(138,31,50,0.4)`,alignSelf:'flex-start',transition:'all .25s'}}>
+        style={{
+          width:'100%', padding:'1rem',
+          background:`linear-gradient(135deg,${T.burgL},#4a0f1c)`,
+          color:T.white, border:'none', borderRadius:10,
+          fontWeight:700, fontSize:'1rem',
+          cursor:sending?'not-allowed':'pointer',
+          opacity:sending?.7:1,
+          boxShadow:`0 6px 24px rgba(138,31,50,0.4)`,
+          transition:'all .25s',
+          fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",
+        }}>
         {sending ? '...' : tx.btn + ' ✦'}
       </button>
     </form>

@@ -13,6 +13,20 @@ export const metadata: Metadata = {
     siteName: "Shaimaa Kalel",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "https://shaimaa-portfolio.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Shaimaa Kalel | Software Engineer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shaimaa Kalel | Software Engineer",
+    description: "Software Engineer & Content Creator based in Abu Dhabi.",
+    images: ["https://shaimaa-portfolio.vercel.app/og-image.png"],
   },
 };
 
