@@ -64,14 +64,23 @@ export default function ProjectDetailPage() {
   return (
     <>
       <style>{`
-        .lightbox-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out; }
+        .lightbox-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:1rem; }
         .lightbox-img     { max-width:90vw;max-height:88vh;border-radius:12px;object-fit:contain; }
         .thumb            { cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid transparent;transition:border-color .2s; }
         .thumb:hover      { border-color:rgba(201,160,72,0.5); }
         .thumb.active     { border-color:${T.gold}; }
+
+        .detail-wrap   { max-width:1050px;margin:0 auto;padding:8rem 2rem 5rem; }
+        .detail-grid   { display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start; }
+        .thumb-grid    { display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem; }
+
+        @media(max-width:768px){
+          .detail-wrap  { padding:6rem 1.25rem 4rem; }
+          .detail-grid  { grid-template-columns:1fr !important; gap:2rem !important; }
+          .thumb-grid   { grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); }
+        }
       `}</style>
 
-      {/* LIGHTBOX */}
       {lightbox && (
         <div className="lightbox-overlay" onClick={()=>setLightbox(null)}>
           <img src={lightbox} alt="full" className="lightbox-img"/>
@@ -81,23 +90,20 @@ export default function ProjectDetailPage() {
       <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir}}>
         <Navbar lang={lang} L={L} onLangChange={setLang}/>
 
-        <div style={{maxWidth:1050,margin:'0 auto',padding:'8rem 2rem 5rem'}}>
-
-          {/* BACK */}
+        <div className="detail-wrap">
           <a href="/projects" style={{display:'inline-flex',alignItems:'center',gap:'.4rem',fontSize:'.85rem',color:T.text2,textDecoration:'none',marginBottom:'2rem',fontWeight:600}}
             onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)} onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>
             ← {lang==='ar'?'كل المشاريع':'All Projects'}
           </a>
 
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'3rem',alignItems:'start'}}>
+          <div className="detail-grid">
 
-            {/* LEFT — images */}
+            {/* IMAGES */}
             <div>
-              {/* main image */}
               {mainImg ? (
-                <div style={{borderRadius:16,overflow:'hidden',border:`1px solid ${T.border}`,marginBottom:'1rem',cursor:'zoom-in'}}
+                <div style={{borderRadius:16,overflow:'hidden',border:`1px solid ${T.border}`,marginBottom:'1rem',cursor:'zoom-in',background:T.bg}}
                   onClick={()=>setLightbox(mainImg)}>
-                  <img src={mainImg} alt={project.title} style={{width:'100%',aspectRatio:'16/10',objectFit:'cover',display:'block'}}/>
+                  <img src={mainImg} alt={project.title} style={{width:'100%',maxHeight:320,objectFit:'contain',display:'block',background:T.bg}}/>
                 </div>
               ) : (
                 <div style={{borderRadius:16,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,aspectRatio:'16/10',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'1rem',border:`1px solid ${T.border}`}}>
@@ -105,9 +111,8 @@ export default function ProjectDetailPage() {
                 </div>
               )}
 
-              {/* thumbnails */}
               {images.length > 1 && (
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(80px,1fr))',gap:'.5rem'}}>
+                <div className="thumb-grid">
                   {images.map((url,i)=>(
                     <div key={i} className={`thumb ${url===mainImg?'active':''}`} onClick={()=>setMainImg(url)}>
                       <img src={url} alt={`thumb-${i}`} style={{width:'100%',height:60,objectFit:'cover',display:'block'}}/>
@@ -117,22 +122,19 @@ export default function ProjectDetailPage() {
               )}
             </div>
 
-            {/* RIGHT — details */}
+            {/* DETAILS */}
             <div>
               <div style={{fontSize:'.65rem',color:T.rose,letterSpacing:3,textTransform:'uppercase',fontFamily:'Playfair Display,serif',marginBottom:'.5rem'}}>{project.category}</div>
-              <h1 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.6rem,4vw,2.2rem)',fontWeight:900,color:T.white,marginBottom:'.75rem',lineHeight:1.3}}>{project.title}</h1>
+              <h1 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.5rem,5vw,2.2rem)',fontWeight:900,color:T.white,marginBottom:'.75rem',lineHeight:1.3}}>{project.title}</h1>
 
-              {/* stack */}
               <div style={{display:'flex',flexWrap:'wrap',gap:'.4rem',marginBottom:'1.5rem'}}>
                 {project.stack?.split(',').map(s=>s.trim()).filter(Boolean).map(s=>(
                   <span key={s} style={{padding:'.3rem .75rem',background:'rgba(201,160,72,0.08)',border:`1px solid ${T.border}`,borderRadius:20,fontSize:'.78rem',color:T.gold,fontWeight:600}}>{s}</span>
                 ))}
               </div>
 
-              {/* description */}
-              <p style={{fontSize:'.95rem',color:T.text2,lineHeight:2,marginBottom:'2rem'}}>{desc}</p>
+              <p style={{fontSize:'.92rem',color:T.text2,lineHeight:2,marginBottom:'2rem'}}>{desc}</p>
 
-              {/* links */}
               <div style={{display:'flex',gap:'1rem',marginBottom:'2rem',flexWrap:'wrap'}}>
                 {project.github && (
                   <a href={project.github} target="_blank" rel="noopener"
@@ -144,7 +146,7 @@ export default function ProjectDetailPage() {
                 )}
                 {project.demo && (
                   <a href={project.demo} target="_blank" rel="noopener"
-                    style={{display:'inline-flex',alignItems:'center',gap:'.5rem',padding:'.75rem 1.5rem',background:`linear-gradient(135deg,rgba(138,31,50,0.5),rgba(74,15,28,0.5))`,border:`1px solid rgba(138,31,50,0.5)`,borderRadius:10,color:T.white,textDecoration:'none',fontSize:'.88rem',fontWeight:700,transition:'all .2s'}}
+                    style={{display:'inline-flex',alignItems:'center',gap:'.5rem',padding:'.75rem 1.5rem',background:`linear-gradient(135deg,rgba(138,31,50,0.5),rgba(74,15,28,0.5))`,border:`1px solid rgba(138,31,50,0.5)`,borderRadius:10,color:T.white,textDecoration:'none',fontSize:'.88rem',fontWeight:700}}
                     onMouseEnter={e=>{e.currentTarget.style.borderColor=T.gold;}}
                     onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(138,31,50,0.5)';}}>
                     Live Demo ↗
@@ -152,7 +154,6 @@ export default function ProjectDetailPage() {
                 )}
               </div>
 
-              {/* PDFs */}
               {pdfs.length > 0 && (
                 <div>
                   <h3 style={{fontFamily:'Playfair Display,serif',fontSize:'1rem',color:T.white,fontWeight:700,marginBottom:'1rem'}}>
