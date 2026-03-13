@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { db } from './lib/firebase';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 import { LANG } from './lib/constants';
 import type { Lang, Project, Course, Article } from './lib/constants';
 import Navbar from './components/Navbar';
@@ -30,9 +30,17 @@ export default function Home() {
   }, [lang, mounted]);
 
   useEffect(() => {
-    // Featured: latest 3 projects only
-    getDocs(collection(db,'projects'))
-      .then(s => setProjects(s.docs.map(d=>({id:d.id,...d.data()} as Project)).slice(0,3)));
+    // Featured projects only — fallback to latest 3 if none featured
+    getDocs(query(collection(db,'projects'), where('featured','==',true)))
+      .then(s => {
+        const featured = s.docs.map(d=>({id:d.id,...d.data()} as Project));
+        if (featured.length > 0) {
+          setProjects(featured);
+        } else {
+          getDocs(collection(db,'projects'))
+            .then(all => setProjects(all.docs.map(d=>({id:d.id,...d.data()} as Project)).slice(0,3)));
+        }
+      });
 
     // Courses: latest 3
     getDocs(collection(db,'courses'))

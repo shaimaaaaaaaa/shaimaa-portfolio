@@ -22,12 +22,15 @@ const LANG = {
     newProject:'New Project', editProject:'Edit Project',
     titlePlaceholder:'Project title *', stackPlaceholder:'Stack (Next.js, Laravel...)',
     githubPlaceholder:'GitHub URL', demoPlaceholder:'Demo URL',
-    descPlaceholder:'Project description',
+    descPlaceholder:'Project description (English)',
+    descArPlaceholder:'Project description (Arabic)',
     saving:'Saving...', saveChanges:'Save Changes ♥', addProject:'Add Project ♥',
     cancel:'Cancel', edit:'Edit', delete:'Delete',
+    featured:'Featured ⭐', notFeatured:'Not Featured',
+    featuredHint:'Featured projects appear on the home page',
     categories:[
-      {value:'web',   label:'Web Development'},
-      {value:'agile', label:'Agile'},
+      {value:'web',      label:'Web Development'},
+      {value:'agile',    label:'Agile'},
       {value:'database', label:'Database'},
       {value:'desktop',  label:'Desktop'},
       {value:'network',  label:'Network'},
@@ -41,9 +44,12 @@ const LANG = {
     newProject:'مشروع جديد', editProject:'تعديل المشروع',
     titlePlaceholder:'عنوان المشروع *', stackPlaceholder:'التقنيات (Next.js, Laravel...)',
     githubPlaceholder:'رابط GitHub', demoPlaceholder:'رابط Demo',
-    descPlaceholder:'وصف المشروع',
+    descPlaceholder:'وصف المشروع (إنجليزي)',
+    descArPlaceholder:'وصف المشروع (عربي)',
     saving:'جاري الحفظ...', saveChanges:'حفظ التغييرات ♥', addProject:'إضافة المشروع ♥',
     cancel:'إلغاء', edit:'تعديل', delete:'حذف',
+    featured:'مميز ⭐', notFeatured:'غير مميز',
+    featuredHint:'المشاريع المميزة تظهر في الصفحة الرئيسية',
     categories:[
       {value:'web',      label:'Web Development'},
       {value:'agile',    label:'Agile'},
@@ -54,7 +60,10 @@ const LANG = {
   },
 };
 
-interface Project { id:string; title:string; desc:string; stack:string; category:string; github:string; demo:string; }
+interface Project {
+  id:string; title:string; desc:string; desc_en:string; desc_ar:string;
+  stack:string; category:string; github:string; demo:string; featured?:boolean;
+}
 
 const inp = (b=T.border): React.CSSProperties => ({
   width:'100%', padding:'.85rem 1rem', background:'rgba(255,255,255,0.04)',
@@ -62,11 +71,13 @@ const inp = (b=T.border): React.CSSProperties => ({
   fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif", fontSize:'.95rem', outline:'none', transition:'border-color .2s',
 });
 
+const EMPTY = {title:'',desc:'',desc_en:'',desc_ar:'',stack:'',category:'web',github:'',demo:'',featured:false};
+
 export default function AdminProjects() {
   const [loading,  setLoading]  = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [editing,  setEditing]  = useState<Project|null>(null);
-  const [form,     setForm]     = useState({title:'',desc:'',stack:'',category:'web',github:'',demo:''});
+  const [form,     setForm]     = useState(EMPTY);
   const [saving,   setSaving]   = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [lang,     setLang]     = useState<'en'|'ar'>('en');
@@ -101,9 +112,20 @@ export default function AdminProjects() {
   async function handleSave() {
     if (!form.title) return;
     setSaving(true);
-    if (editing) await updateDoc(doc(db,'projects',editing.id),{...form});
-    else await addDoc(collection(db,'projects'),{...form});
-    setForm({title:'',desc:'',stack:'',category:'web',github:'',demo:''});
+    const data = {
+      title:    form.title,
+      desc:     form.desc_en || form.desc,
+      desc_en:  form.desc_en || form.desc,
+      desc_ar:  form.desc_ar,
+      stack:    form.stack,
+      category: form.category,
+      github:   form.github,
+      demo:     form.demo,
+      featured: form.featured,
+    };
+    if (editing) await updateDoc(doc(db,'projects',editing.id), data);
+    else await addDoc(collection(db,'projects'), data);
+    setForm(EMPTY);
     setEditing(null);
     setShowForm(false);
     await fetchProjects();
@@ -116,14 +138,30 @@ export default function AdminProjects() {
     await fetchProjects();
   }
 
+  async function toggleFeatured(p:Project) {
+    await updateDoc(doc(db,'projects',p.id), {featured: !p.featured});
+    await fetchProjects();
+  }
+
   function handleEdit(p:Project) {
     setEditing(p);
-    setForm({title:p.title,desc:p.desc,stack:p.stack,category:p.category,github:p.github,demo:p.demo});
+    setForm({
+      title:    p.title,
+      desc:     p.desc,
+      desc_en:  p.desc_en || p.desc,
+      desc_ar:  p.desc_ar || '',
+      stack:    p.stack,
+      category: p.category,
+      github:   p.github,
+      demo:     p.demo,
+      featured: p.featured || false,
+    });
     setShowForm(true);
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
   const L = LANG[lang];
+  const featuredCount = projects.filter(p=>p.featured).length;
 
   if (loading) return (
     <main style={{minHeight:'100vh',background:T.bg,display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -160,13 +198,21 @@ export default function AdminProjects() {
           <div style={{width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`}}/>
         </div>
 
+        {/* FEATURED HINT */}
+        <div style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'.85rem 1.25rem',background:'rgba(201,160,72,0.08)',border:`1px solid rgba(201,160,72,0.2)`,borderRadius:12,marginBottom:'1.5rem',fontSize:'.85rem',color:T.text2}}>
+          <span style={{fontSize:'1.1rem'}}>⭐</span>
+          <span>{L.featuredHint}</span>
+          <span style={{marginLeft:'auto',color:T.gold,fontWeight:700}}>{featuredCount} featured</span>
+        </div>
+
         {!showForm && (
-          <button onClick={()=>{setEditing(null);setForm({title:'',desc:'',stack:'',category:'web',github:'',demo:''});setShowForm(true);}}
+          <button onClick={()=>{setEditing(null);setForm(EMPTY);setShowForm(true);}}
             style={{padding:'.85rem 2rem',background:`linear-gradient(135deg,${T.burgL},#4a0f1c)`,color:T.white,border:'none',borderRadius:10,fontWeight:700,fontSize:'.95rem',cursor:'pointer',boxShadow:`0 4px 20px rgba(138,31,50,0.4)`,marginBottom:'2.5rem'}}>
             {L.addNew}
           </button>
         )}
 
+        {/* FORM */}
         {showForm && (
           <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,padding:'2rem',marginBottom:'2.5rem'}}>
             <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'1.3rem',color:T.white,fontWeight:700,marginBottom:'1.5rem'}}>
@@ -180,7 +226,20 @@ export default function AdminProjects() {
               <select value={form.category} onChange={e=>setForm({...form,category:e.target.value})} style={{...inp(),cursor:'pointer'}}>
                 {L.categories.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
-              <textarea placeholder={L.descPlaceholder} value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})} rows={3} style={{...inp(),resize:'vertical',gridColumn:'1/-1'}} onFocus={e=>(e.target.style.borderColor=T.gold)} onBlur={e=>(e.target.style.borderColor=T.border)}/>
+
+              {/* FEATURED TOGGLE */}
+              <div style={{display:'flex',alignItems:'center',gap:'1rem',padding:'.85rem 1rem',background:'rgba(255,255,255,0.03)',border:`1px solid ${form.featured?'rgba(201,160,72,0.5)':T.border}`,borderRadius:10,cursor:'pointer'}}
+                onClick={()=>setForm({...form,featured:!form.featured})}>
+                <div style={{width:40,height:22,borderRadius:11,background:form.featured?'rgba(201,160,72,0.6)':'rgba(255,255,255,0.1)',border:`1px solid ${form.featured?T.gold:T.border}`,position:'relative',transition:'all .2s',flexShrink:0}}>
+                  <div style={{position:'absolute',top:2,left:form.featured?20:2,width:16,height:16,borderRadius:'50%',background:form.featured?T.gold:'#666',transition:'all .2s'}}/>
+                </div>
+                <span style={{fontSize:'.88rem',color:form.featured?T.gold:T.muted,fontWeight:600}}>
+                  {form.featured ? L.featured : L.notFeatured}
+                </span>
+              </div>
+
+              <textarea placeholder={L.descPlaceholder} value={form.desc_en} onChange={e=>setForm({...form,desc_en:e.target.value})} rows={3} style={{...inp(),resize:'vertical',gridColumn:'1/-1',direction:'ltr'}} onFocus={e=>(e.target.style.borderColor=T.gold)} onBlur={e=>(e.target.style.borderColor=T.border)}/>
+              <textarea placeholder={L.descArPlaceholder} value={form.desc_ar} onChange={e=>setForm({...form,desc_ar:e.target.value})} rows={3} style={{...inp(),resize:'vertical',gridColumn:'1/-1',direction:'rtl'}} onFocus={e=>(e.target.style.borderColor=T.gold)} onBlur={e=>(e.target.style.borderColor=T.border)}/>
             </div>
             <div style={{display:'flex',gap:'1rem',marginTop:'1.25rem'}}>
               <button onClick={handleSave} disabled={saving}
@@ -195,22 +254,32 @@ export default function AdminProjects() {
           </div>
         )}
 
+        {/* LIST */}
         <div style={{display:'flex',flexDirection:'column',gap:'1.1rem'}}>
           {projects.length===0 && <p style={{color:T.muted,textAlign:'center',padding:'3rem'}}>{L.noProjects}</p>}
           {projects.map(p=>(
-            <div key={p.id} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.4rem',display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'1rem',transition:'border-color .2s'}}
+            <div key={p.id} style={{background:T.card,border:`1px solid ${p.featured?'rgba(201,160,72,0.45)':T.border}`,borderRadius:16,padding:'1.4rem',display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'1rem',transition:'border-color .2s'}}
               onMouseEnter={e=>(e.currentTarget.style.borderColor='rgba(201,160,72,0.4)')}
-              onMouseLeave={e=>(e.currentTarget.style.borderColor=T.border)}>
+              onMouseLeave={e=>(e.currentTarget.style.borderColor=p.featured?'rgba(201,160,72,0.45)':T.border)}>
               <div style={{flex:1}}>
-                <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.05rem',fontWeight:700,color:T.white,marginBottom:'.3rem'}}>{p.title}</div>
+                <div style={{display:'flex',alignItems:'center',gap:'.6rem',marginBottom:'.3rem'}}>
+                  {p.featured && <span style={{fontSize:'.85rem'}} title="Featured on home page">⭐</span>}
+                  <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.05rem',fontWeight:700,color:T.white}}>{p.title}</div>
+                </div>
                 <div style={{fontSize:'.85rem',color:T.gold,fontWeight:600,marginBottom:'.3rem'}}>{p.stack}</div>
-                <div style={{fontSize:'.82rem',color:T.muted,lineHeight:1.7}}>{p.desc}</div>
+                <div style={{fontSize:'.82rem',color:T.muted,lineHeight:1.7}}>{p.desc_en||p.desc}</div>
                 <div style={{display:'flex',gap:'1rem',marginTop:'.5rem'}}>
                   {p.github && <a href={p.github} target="_blank" rel="noopener" style={{fontSize:'.78rem',color:T.text2,textDecoration:'none'}} onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)} onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>GitHub ↗</a>}
                   {p.demo   && <a href={p.demo}   target="_blank" rel="noopener" style={{fontSize:'.78rem',color:T.text2,textDecoration:'none'}} onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)} onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>Demo ↗</a>}
                 </div>
               </div>
-              <div style={{display:'flex',gap:'.6rem',flexShrink:0}}>
+              <div style={{display:'flex',gap:'.6rem',flexShrink:0,flexWrap:'wrap',justifyContent:'flex-end'}}>
+                {/* FEATURED TOGGLE BUTTON */}
+                <button onClick={()=>toggleFeatured(p)}
+                  title={p.featured?'Remove from featured':'Add to featured'}
+                  style={{padding:'.5rem .85rem',background:p.featured?'rgba(201,160,72,0.15)':'transparent',border:`1px solid ${p.featured?T.gold:T.border}`,borderRadius:8,color:p.featured?T.gold:T.muted,fontSize:'.9rem',cursor:'pointer',transition:'all .2s'}}>
+                  ⭐
+                </button>
                 <button onClick={()=>handleEdit(p)}
                   style={{padding:'.5rem 1rem',background:'transparent',border:`1px solid ${T.border}`,borderRadius:8,color:T.text2,fontSize:'.85rem',fontWeight:600,cursor:'pointer'}}>
                   {L.edit}
