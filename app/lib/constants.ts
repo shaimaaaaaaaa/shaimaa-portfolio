@@ -79,6 +79,40 @@ export const LANG = {
 export type Lang = 'en' | 'ar';
 export type LangData = typeof LANG['en'] | typeof LANG['ar'];
 
-export interface Project { id:string; title:string; desc:string; desc_en:string; desc_ar:string; stack:string; category:string; github:string; demo:string; }
-export interface Course  { id:string; title:string; desc:string; category:string; lessons:unknown[]; }
-export interface Article { id:string; title:string; title_ar:string; excerpt:string; excerpt_ar:string; category:string; readTime:number; createdAt?:{seconds:number}; }
+export interface PdfFile { name: string; url: string; }
+
+export interface Project {
+  id: string;
+  title: string;
+  desc: string;
+  desc_en: string;
+  desc_ar: string;
+  stack: string;
+  category: string;
+  github: string;
+  demo: string;
+  featured?: boolean;
+  imageUrl?: string;
+  images?: string[];
+  pdfs?: PdfFile[];
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  desc: string;
+  category: string;
+  imageUrl?: string;
+  lessons: unknown[];
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  title_ar: string;
+  excerpt: string;
+  excerpt_ar: string;
+  category: string;
+  readTime: number;
+  createdAt?: { seconds: number };
+}
