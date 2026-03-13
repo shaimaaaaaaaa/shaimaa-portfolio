@@ -12,26 +12,49 @@ interface CoursesProps { L: LangData; lang: Lang; courses: Course[]; showViewAll
 
 export function CoursesSection({ L, lang, courses, showViewAll = false }: CoursesProps) {
   const eyebrow: React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
+  const rule: React.CSSProperties = {width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`};
+  const viewAllLabel = lang === 'ar' ? 'عرض كل الكورسات' : 'View All Courses';
 
   return (
     <section id="courses" className="section-pad" style={{padding:'7rem 3rem',background:T.bg}}>
       <div style={{maxWidth:1050,margin:'0 auto'}}>
-        <div style={{marginBottom:'3rem'}}>
-          <span style={eyebrow}>{L.courseSub}</span>
-          <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.8rem,4vw,2.4rem)',fontWeight:900,color:T.white}}>
-            {L.courseTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.courseSpan}</span>
-          </h2>
-          <div style={{width:60,height:2,marginTop:'1rem',background:`linear-gradient(90deg,${T.gold},transparent)`}}/>
+        <div style={{marginBottom:'3rem',display:'flex',justifyContent:'space-between',alignItems:'flex-end',flexWrap:'wrap',gap:'1rem'}}>
+          <div>
+            <span style={eyebrow}>{L.courseSub}</span>
+            <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.8rem,4vw,2.4rem)',fontWeight:900,color:T.white}}>
+              {L.courseTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.courseSpan}</span>
+            </h2>
+            <div style={rule}/>
+          </div>
+          {showViewAll && (
+            <Link href="/courses"
+              style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}
+              onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
+              onMouseLeave={e=>(e.currentTarget.style.color=T.gold)}>
+              {viewAllLabel} →
+            </Link>
+          )}
         </div>
+
         <div className="cards-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:'1.5rem'}}>
           {courses.length===0 && <p style={{color:T.muted,gridColumn:'1/-1',textAlign:'center',padding:'3rem'}}>{L.noCourse}</p>}
           {courses.map((c,idx) => (
-            <Link key={c.id} href={`/courses/${c.id}`} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.75rem',textDecoration:'none',display:'flex',flexDirection:'column',transition:'all .3s'}}
+            <Link key={c.id} href={`/courses/${c.id}`}
+              style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.75rem',textDecoration:'none',display:'flex',flexDirection:'column',transition:'all .3s'}}
               onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor='rgba(201,160,72,0.5)';el.style.transform='translateY(-5px)';}}
               onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor=T.border;el.style.transform='translateY(0)';}}>
-              <div style={{width:48,height:48,borderRadius:12,background:'rgba(138,31,50,0.35)',border:`1px solid ${T.border}`,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'1.1rem'}}>
-                <span style={{fontFamily:'Playfair Display,serif',color:T.goldL,fontWeight:700,fontSize:'1rem'}}>{String(idx+1).padStart(2,'0')}</span>
-              </div>
+
+              {/* cover image OR number badge */}
+              {c.imageUrl ? (
+                <div style={{width:'100%',height:140,borderRadius:10,overflow:'hidden',marginBottom:'1.1rem',border:`1px solid ${T.border}`}}>
+                  <img src={c.imageUrl} alt={c.title} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+                </div>
+              ) : (
+                <div style={{width:48,height:48,borderRadius:12,background:'rgba(138,31,50,0.35)',border:`1px solid ${T.border}`,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'1.1rem'}}>
+                  <span style={{fontFamily:'Playfair Display,serif',color:T.goldL,fontWeight:700,fontSize:'1rem'}}>{String(idx+1).padStart(2,'0')}</span>
+                </div>
+              )}
+
               <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.05rem',fontWeight:700,color:T.white,marginBottom:'.5rem',lineHeight:1.4}}>{c.title}</div>
               <div style={{fontSize:'.85rem',color:T.text2,lineHeight:1.9,flex:1,marginBottom:'1.1rem'}}>{c.desc}</div>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'.85rem',borderTop:`1px solid rgba(200,158,72,0.12)`}}>
@@ -71,12 +94,18 @@ export function ArticlesSection({ L, lang, articles }: ArticlesProps) {
             </h2>
             <div style={rule}/>
           </div>
-          <Link href="/articles" style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}>{L.viewAll}</Link>
+          <Link href="/articles"
+            style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}
+            onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
+            onMouseLeave={e=>(e.currentTarget.style.color=T.gold)}>
+            {L.viewAll} →
+          </Link>
         </div>
         {articles.length===0 && <p style={{color:T.muted,textAlign:'center',padding:'3rem'}}>{L.noArticles}</p>}
         <div className="cards-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(290px,1fr))',gap:'1.5rem'}}>
           {articles.map(a=>(
-            <Link key={a.id} href={`/articles/${a.id}`} style={{textDecoration:'none',display:'flex',flexDirection:'column',background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden',transition:'all .3s'}}
+            <Link key={a.id} href={`/articles/${a.id}`}
+              style={{textDecoration:'none',display:'flex',flexDirection:'column',background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden',transition:'all .3s'}}
               onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.transform='translateY(-6px)';el.style.borderColor='rgba(201,160,72,0.5)';}}
               onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.transform='translateY(0)';el.style.borderColor=T.border;}}>
               <div style={{height:120,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
@@ -162,11 +191,9 @@ export function Footer({ L }: FooterProps) {
   function handleHeartClick() {
     const next = clicks + 1;
     setClicks(next);
-
     if (timer) clearTimeout(timer);
     const t = setTimeout(() => setClicks(0), 1500);
     setTimer(t);
-
     if (next >= 3) {
       setClicks(0);
       window.location.href = '/admin/login';
@@ -176,13 +203,7 @@ export function Footer({ L }: FooterProps) {
   return (
     <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted,lineHeight:1.8}}>
       Made with{' '}
-      <span
-        onClick={handleHeartClick}
-        style={{color:T.gold, cursor:'pointer', fontSize: clicks > 0 ? '1.1rem' : '1rem', transition:'font-size .15s'}}
-        title=""
-      >
-        ♥
-      </span>
+      <span onClick={handleHeartClick} style={{color:T.gold,cursor:'pointer',fontSize:clicks>0?'1.1rem':'1rem',transition:'font-size .15s'}} title="">♥</span>
       {' '}by{' '}
       <span style={{color:T.goldL,fontWeight:700}}>Shaimaa Kalel</span>
       {' '}· {L.footTxt}
