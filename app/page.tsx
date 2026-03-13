@@ -16,7 +16,6 @@ export default function Home() {
   const [lang,     setLang]     = useState<Lang>('en');
   const [mounted,  setMounted]  = useState(false);
 
-  // ── lang init ──
   useEffect(() => {
     const saved = localStorage.getItem('lang') as Lang;
     if (saved === 'ar' || saved === 'en') setLang(saved);
@@ -30,15 +29,20 @@ export default function Home() {
     document.documentElement.lang = lang;
   }, [lang, mounted]);
 
-  // ── data fetch ──
   useEffect(() => {
-    getDocs(collection(db,'projects')).then(s => setProjects(s.docs.map(d=>({id:d.id,...d.data()} as Project))));
-    getDocs(collection(db,'courses')).then(s  => setCourses(s.docs.map(d=>({id:d.id,...d.data()} as Course))));
+    // Featured: latest 3 projects only
+    getDocs(collection(db,'projects'))
+      .then(s => setProjects(s.docs.map(d=>({id:d.id,...d.data()} as Project)).slice(0,3)));
+
+    // Courses: latest 3
+    getDocs(collection(db,'courses'))
+      .then(s => setCourses(s.docs.map(d=>({id:d.id,...d.data()} as Course)).slice(0,3)));
+
+    // Latest 3 articles
     getDocs(query(collection(db,'articles'), orderBy('createdAt','desc'), limit(3)))
       .then(s => setArticles(s.docs.map(d=>({id:d.id,...d.data()} as Article))))
-      .catch(() => getDocs(collection(db,'articles')).then(s =>
-        setArticles(s.docs.map(d=>({id:d.id,...d.data()} as Article)).slice(0,3))
-      ));
+      .catch(() => getDocs(collection(db,'articles'))
+        .then(s => setArticles(s.docs.map(d=>({id:d.id,...d.data()} as Article)).slice(0,3))));
   }, []);
 
   const L = LANG[lang];
@@ -73,8 +77,8 @@ export default function Home() {
       <main style={{background:'#0e0608',color:'#ede4de',minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif"}}>
         <Navbar lang={lang} L={L} onLangChange={setLang} />
         <Hero L={L} />
-        <ProjectsSection L={L} lang={lang} projects={projects} />
-        <CoursesSection  L={L} lang={lang} courses={courses} />
+        <ProjectsSection L={L} lang={lang} projects={projects} showViewAll={true} />
+        <CoursesSection  L={L} lang={lang} courses={courses} showViewAll={true} />
         <ArticlesSection L={L} lang={lang} articles={articles} />
         <ContactSection  L={L} lang={lang} />
         <Footer L={L} />

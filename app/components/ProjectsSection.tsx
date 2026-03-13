@@ -1,11 +1,12 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { T } from '../lib/constants';
 import type { Lang, LangData, Project } from '../lib/constants';
 
-interface Props { L: LangData; lang: Lang; projects: Project[]; }
+interface Props { L: LangData; lang: Lang; projects: Project[]; showViewAll?: boolean; }
 
-export default function ProjectsSection({ L, lang, projects }: Props) {
+export default function ProjectsSection({ L, lang, projects, showViewAll = false }: Props) {
   const [filter, setFilter] = useState('all');
   const filtered = filter==='all' ? projects : projects.filter(p=>p.category===filter);
 
@@ -15,21 +16,30 @@ export default function ProjectsSection({ L, lang, projects }: Props) {
   return (
     <section id="projects" className="section-pad" style={{padding:'7rem 3rem',background:T.bg2}}>
       <div style={{maxWidth:1050,margin:'0 auto'}}>
-        <div style={{marginBottom:'3rem'}}>
-          <span style={eyebrow}>{L.projSub}</span>
-          <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.8rem,4vw,2.4rem)',fontWeight:900,color:T.white}}>
-            {L.projTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.projSpan}</span>
-          </h2>
-          <div style={rule}/>
+        <div className="section-header-row" style={{marginBottom:'3rem',display:'flex',justifyContent:'space-between',alignItems:'flex-end',flexWrap:'wrap',gap:'1rem'}}>
+          <div>
+            <span style={eyebrow}>{L.projSub}</span>
+            <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.8rem,4vw,2.4rem)',fontWeight:900,color:T.white}}>
+              {L.projTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.projSpan}</span>
+            </h2>
+            <div style={rule}/>
+          </div>
+          {showViewAll && (
+            <Link href="/projects" style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}>
+              {L.projViewAll}
+            </Link>
+          )}
         </div>
 
-        <div className="filters-wrap" style={{display:'flex',gap:'.55rem',flexWrap:'wrap',marginBottom:'2rem'}}>
-          {L.filters.map(([v,l]) => (
-            <button key={v} onClick={()=>setFilter(v)} style={{padding:'.5rem 1.1rem',background:filter===v?'rgba(138,31,50,0.5)':'transparent',border:`1px solid ${filter===v?T.burg:T.border}`,borderRadius:24,color:filter===v?T.white:T.text2,fontSize:'.85rem',fontWeight:600,cursor:'pointer',transition:'all .2s'}}>
-              {l}
-            </button>
-          ))}
-        </div>
+        {!showViewAll && (
+          <div className="filters-wrap" style={{display:'flex',gap:'.55rem',flexWrap:'wrap',marginBottom:'2rem'}}>
+            {L.filters.map(([v,l]) => (
+              <button key={v} onClick={()=>setFilter(v)} style={{padding:'.5rem 1.1rem',background:filter===v?'rgba(138,31,50,0.5)':'transparent',border:`1px solid ${filter===v?T.burg:T.border}`,borderRadius:24,color:filter===v?T.white:T.text2,fontSize:'.85rem',fontWeight:600,cursor:'pointer',transition:'all .2s'}}>
+                {l}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="cards-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:'1.5rem'}}>
           {filtered.length===0 && <p style={{color:T.muted,gridColumn:'1/-1',textAlign:'center',padding:'3rem'}}>{L.noProj}</p>}
