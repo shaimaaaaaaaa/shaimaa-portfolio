@@ -153,7 +153,7 @@ export function ContactSection({ L, lang }: ContactProps) {
 // ═══════════════════════════════
 //  FOOTER
 // ═══════════════════════════════
-
+interface FooterProps { L: LangData; }
 
 export function Footer({ L }: FooterProps) {
   const [clicks, setClicks] = useState(0);
@@ -163,12 +163,10 @@ export function Footer({ L }: FooterProps) {
     const next = clicks + 1;
     setClicks(next);
 
-    // reset timer
     if (timer) clearTimeout(timer);
     const t = setTimeout(() => setClicks(0), 1500);
     setTimer(t);
 
-    // 3 clicks → go to admin
     if (next >= 3) {
       setClicks(0);
       window.location.href = '/admin/login';
