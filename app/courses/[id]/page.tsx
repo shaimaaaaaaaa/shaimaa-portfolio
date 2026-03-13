@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import { db } from '../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
-import Link from 'next/link';
+import { LANG as NAV_LANG } from '../../lib/constants';
+import type { Lang } from '../../lib/constants';
+import Navbar from '../../components/Navbar';
 
 const T = {
   bg:'#0e0608', bg2:'#140a0c', card:'#1a0c10', burg:'#8a1f32',
@@ -24,6 +26,21 @@ export default function CoursePage() {
   const [answers,      setAnswers]      = useState<Record<string,number>>({});
   const [submitted,    setSubmitted]    = useState<Record<string,boolean>>({});
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
+  const [lang,         setLang]         = useState<Lang>('en');
+  const [mounted,      setMounted]      = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('lang') as Lang;
+    if (saved==='ar'||saved==='en') setLang(saved);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    localStorage.setItem('lang', lang);
+    document.documentElement.dir  = lang==='ar'?'rtl':'ltr';
+    document.documentElement.lang = lang;
+  }, [lang, mounted]);
 
   useEffect(() => {
     if (!id) return;
@@ -36,6 +53,8 @@ export default function CoursePage() {
     const m = url.match(/(?:v=|youtu\.be\/)([^&\n?#]+)/);
     return m ? m[1] : url;
   }
+
+  const LN = NAV_LANG[lang];
 
   if (!course) return (
     <main style={{minHeight:'100vh',background:T.bg,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif"}}>
@@ -52,105 +71,38 @@ export default function CoursePage() {
         .course-layout {
           display: grid;
           grid-template-columns: 280px 1fr;
-          min-height: calc(100vh - 60px);
-          padding-top: 60px;
+          min-height: calc(100vh - 64px);
+          padding-top: 64px;
         }
         .course-sidebar {
           position: sticky;
-          top: 60px;
-          height: calc(100vh - 60px);
+          top: 64px;
+          height: calc(100vh - 64px);
           overflow-y: auto;
           background: ${T.bg2};
           border-right: 1px solid ${T.border};
           padding: 1.5rem 1rem;
-          display: block;
         }
-        .course-content {
-          padding: 2.5rem 3rem;
-          max-width: 820px;
-          width: 100%;
-        }
+        .course-content { padding: 2.5rem 3rem; max-width: 820px; width: 100%; }
         .mobile-lesson-bar { display: none; }
-        .mobile-sidebar-overlay { display: none; }
 
         @media (max-width: 768px) {
-          .course-layout {
-            grid-template-columns: 1fr;
-            padding-top: 56px;
-          }
-          .course-sidebar {
-            display: none;
-          }
-          .course-content {
-            padding: 1.25rem 1rem;
-            max-width: 100%;
-          }
+          .course-layout { grid-template-columns: 1fr; padding-top: 56px; }
+          .course-sidebar { display: none; }
+          .course-content { padding: 1.25rem 1rem; max-width: 100%; }
           .mobile-lesson-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: .75rem 1rem;
-            background: ${T.bg2};
+            display: flex; align-items: center; justify-content: space-between;
+            padding: .75rem 1rem; background: ${T.bg2};
             border-bottom: 1px solid ${T.border};
-            position: sticky;
-            top: 56px;
-            z-index: 50;
+            position: sticky; top: 56px; z-index: 50;
           }
-          .mobile-sidebar-overlay {
-            display: block;
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: rgba(0,0,0,0.7);
-          }
-          .mobile-sidebar-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 85%;
-            max-width: 320px;
-            background: ${T.bg2};
-            border-right: 1px solid ${T.border};
-            padding: 1.5rem 1rem;
-            overflow-y: auto;
-            z-index: 201;
-          }
-          .video-wrapper {
-            aspect-ratio: 16/9;
-            border-radius: 10px !important;
-            margin-bottom: 1.5rem !important;
-          }
-          .quiz-box {
-            padding: 1.25rem !important;
-            border-radius: 12px !important;
-          }
-          .lesson-nav-btns {
-            flex-direction: column !important;
-            gap: .75rem !important;
-          }
-          .lesson-nav-btns button {
-            width: 100% !important;
-            justify-content: center !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .course-content {
-            padding: 1rem .85rem;
-          }
+          .lesson-nav-btns { flex-direction: column !important; gap: .75rem !important; }
+          .lesson-nav-btns button { width: 100% !important; justify-content: center !important; }
         }
       `}</style>
 
-      {/* NAV */}
-      <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,padding:'.85rem 1.25rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
-        <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.1rem',color:T.goldL,textDecoration:'none',fontWeight:700}}>♥ Shaimaa Kalel</Link>
-        <Link href="/#courses" style={{fontSize:'.85rem',color:T.text2,textDecoration:'none',fontWeight:600}}
-          onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
-          onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>
-          All Courses ←
-        </Link>
-      </nav>
+      {/* SHARED NAV */}
+      <Navbar lang={lang} L={LN} onLangChange={setLang} />
 
       {/* MOBILE LESSON BAR */}
       <div className="mobile-lesson-bar">
@@ -165,12 +117,11 @@ export default function CoursePage() {
 
       {/* MOBILE SIDEBAR OVERLAY */}
       {sidebarOpen && (
-        <div className="mobile-sidebar-overlay" onClick={()=>setSidebarOpen(false)}>
-          <div className="mobile-sidebar-panel" onClick={e=>e.stopPropagation()}>
+        <div style={{position:'fixed',inset:0,zIndex:200,background:'rgba(0,0,0,0.7)'}} onClick={()=>setSidebarOpen(false)}>
+          <div style={{position:'fixed',top:0,left:0,bottom:0,width:'85%',maxWidth:320,background:T.bg2,border:`1px solid ${T.border}`,padding:'1.5rem 1rem',overflowY:'auto',zIndex:201}} onClick={e=>e.stopPropagation()}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
               <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'.95rem',fontWeight:700,color:T.white,lineHeight:1.4,flex:1,marginRight:'1rem'}}>{course.title}</h2>
-              <button onClick={()=>setSidebarOpen(false)}
-                style={{background:'none',border:'none',color:T.muted,fontSize:'1.4rem',cursor:'pointer',padding:'.25rem',flexShrink:0}}>✕</button>
+              <button onClick={()=>setSidebarOpen(false)} style={{background:'none',border:'none',color:T.muted,fontSize:'1.4rem',cursor:'pointer'}}>✕</button>
             </div>
             <div style={{fontSize:'.75rem',color:T.muted,marginBottom:'1rem'}}>{course.lessons?.length||0} lessons</div>
             <div style={{display:'flex',flexDirection:'column',gap:'.35rem'}}>
@@ -219,7 +170,7 @@ export default function CoursePage() {
               </div>
 
               {/* VIDEO */}
-              <div className="video-wrapper" style={{borderRadius:14,overflow:'hidden',aspectRatio:'16/9',marginBottom:'2rem',background:'#000',boxShadow:`0 20px 60px rgba(0,0,0,0.6)`}}>
+              <div style={{borderRadius:14,overflow:'hidden',aspectRatio:'16/9',marginBottom:'2rem',background:'#000',boxShadow:`0 20px 60px rgba(0,0,0,0.6)`}}>
                 <iframe width="100%" height="100%"
                   src={`https://www.youtube.com/embed/${getYtId(lesson.videoUrl)}`}
                   allowFullScreen style={{border:'none',display:'block'}}/>
@@ -227,7 +178,7 @@ export default function CoursePage() {
 
               {/* QUIZ */}
               {lesson.quiz?.length > 0 && (
-                <div className="quiz-box" style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,padding:'2rem'}}>
+                <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,padding:'2rem'}}>
                   <div style={{marginBottom:'1.5rem'}}>
                     <span style={{fontSize:'.65rem',letterSpacing:3,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.4rem'}}>knowledge check</span>
                     <h3 style={{fontFamily:'Playfair Display,serif',fontSize:'1.2rem',color:T.white,fontWeight:700}}>Quiz</h3>

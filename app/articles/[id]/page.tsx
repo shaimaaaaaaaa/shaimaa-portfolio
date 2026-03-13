@@ -2,7 +2,8 @@
 import { useEffect, useState, use } from 'react';
 import { db } from '../../lib/firebase';
 import { doc, getDoc, collection, addDoc, getDocs, orderBy, query, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
-import Link from 'next/link';
+import { LANG as NAV_LANG } from '../../lib/constants';
+import type { Lang } from '../../lib/constants';
 import Navbar from '../../components/Navbar';
 
 const T = {
@@ -15,24 +16,20 @@ const T = {
 
 const LANG = {
   en: {
-    dir:'ltr', langBtn:'العربية', back:'← Back to Articles',
+    dir:'ltr' as const, langBtn:'العربية', back:'← Back to Articles',
     minRead:'min read', comments:'Comments',
-    like:'Like ❤️', liked:'Liked ❤️',
-    shareOn:'Share on',
+    like:'Like ❤️', liked:'Liked ❤️', shareOn:'Share on',
     writeComment:'Write a comment...', yourName:'Your name',
     postComment:'Post Comment', posting:'Posting...',
-    noComments:'Be the first to comment!',
-    commentPosted:'Comment posted!',
+    noComments:'Be the first to comment!', commentPosted:'Comment posted!',
   },
   ar: {
-    dir:'rtl', langBtn:'English', back:'المقالات ←',
+    dir:'rtl' as const, langBtn:'English', back:'المقالات ←',
     minRead:'دقيقة قراءة', comments:'تعليقات',
-    like:'أعجبني ❤️', liked:'معجب ❤️',
-    shareOn:'شارك على',
+    like:'أعجبني ❤️', liked:'معجب ❤️', shareOn:'شارك على',
     writeComment:'اكتب تعليقاً...', yourName:'اسمك',
     postComment:'نشر التعليق', posting:'جاري النشر...',
-    noComments:'كن أول من يعلق!',
-    commentPosted:'تم نشر تعليقك!',
+    noComments:'كن أول من يعلق!', commentPosted:'تم نشر تعليقك!',
   },
 };
 
@@ -54,11 +51,11 @@ export default function ArticlePage({ params }:{ params: Promise<{ id:string }> 
   const [text,       setText]       = useState('');
   const [posting,    setPosting]    = useState(false);
   const [posted,     setPosted]     = useState(false);
-  const [lang,       setLang]       = useState<'en'|'ar'>('en');
+  const [lang,       setLang]       = useState<Lang>('en');
   const [mounted,    setMounted]    = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('lang') as 'en'|'ar';
+    const saved = localStorage.getItem('lang') as Lang;
     if (saved === 'ar' || saved === 'en') setLang(saved);
     if (localStorage.getItem(`liked_${id}`)) setLiked(true);
     setMounted(true);
@@ -125,13 +122,14 @@ export default function ArticlePage({ params }:{ params: Promise<{ id:string }> 
     if (urls[platform]) window.open(urls[platform],'_blank');
   }
 
-  const inp:React.CSSProperties = {
-    width:'100%',padding:'.85rem 1rem',background:'rgba(255,255,255,0.04)',
-    border:`1px solid ${T.border}`,borderRadius:10,color:T.text,
-    fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",fontSize:'.95rem',outline:'none',
+  const inp: React.CSSProperties = {
+    width:'100%', padding:'.85rem 1rem', background:'rgba(255,255,255,0.04)',
+    border:`1px solid ${T.border}`, borderRadius:10, color:T.text,
+    fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif", fontSize:'.95rem', outline:'none',
   };
 
-  const L = LANG[lang];
+  const L  = LANG[lang];
+  const LN = NAV_LANG[lang];
 
   if (!mounted||!article) return (
     <main style={{minHeight:'100vh',background:T.bg,display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -140,16 +138,16 @@ export default function ArticlePage({ params }:{ params: Promise<{ id:string }> 
   );
 
   return (
-    <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir as 'ltr'|'rtl'}}>
+    <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir}}>
 
-      <Navbar lang={lang} onLangChange={setLang} />
+      <Navbar lang={lang} L={LN} onLangChange={setLang} />
 
-      <div style={{maxWidth:780,margin:'0 auto',padding:'5.5rem 1.25rem 4rem',position:'relative',zIndex:1}}>
+      <div style={{maxWidth:780,margin:'0 auto',padding:'7rem 1.5rem 4rem',position:'relative',zIndex:1}}>
 
         {/* BACK */}
-        <Link href="/articles" style={{display:'inline-flex',alignItems:'center',gap:'.5rem',color:T.text2,textDecoration:'none',fontSize:'.88rem',fontWeight:600,marginBottom:'1.75rem'}}>
+        <a href="/articles" style={{display:'inline-flex',alignItems:'center',gap:'.5rem',color:T.text2,textDecoration:'none',fontSize:'.88rem',fontWeight:600,marginBottom:'1.75rem'}}>
           {L.back}
-        </Link>
+        </a>
 
         {/* HEADER */}
         <div style={{marginBottom:'2rem'}}>
@@ -193,7 +191,6 @@ export default function ArticlePage({ params }:{ params: Promise<{ id:string }> 
             {L.comments} <span style={{color:T.gold,fontSize:'1rem'}}>({comments.length})</span>
           </h2>
 
-          {/* FORM */}
           <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:'1.25rem',marginBottom:'1.5rem'}}>
             <div style={{display:'flex',flexDirection:'column',gap:'.85rem'}}>
               <input placeholder={L.yourName} value={name} onChange={e=>setName(e.target.value)} style={inp}
@@ -211,7 +208,6 @@ export default function ArticlePage({ params }:{ params: Promise<{ id:string }> 
             </div>
           </div>
 
-          {/* LIST */}
           {comments.length===0 && <p style={{color:T.muted,textAlign:'center',padding:'2rem'}}>{L.noComments}</p>}
           <div style={{display:'flex',flexDirection:'column',gap:'.85rem'}}>
             {comments.map(c=>(

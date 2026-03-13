@@ -2,7 +2,9 @@
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-import Link from 'next/link';
+import { LANG } from '../lib/constants';
+import type { Lang } from '../lib/constants';
+import Navbar from '../components/Navbar';
 
 const T = {
   bg:'#0e0608', bg2:'#140a0c', card:'#1a0c10', burg:'#8a1f32', burgL:'#a02840',
@@ -13,8 +15,7 @@ const T = {
 
 const TX = {
   en: {
-    nav:[['/','Home'],['/about','About'],['/#projects','Projects'],['/#courses','Courses'],['/articles','Articles'],['/#contact','Contact']] as [string,string][],
-    langBtn:'العربية', dir:'ltr',
+    dir:'ltr' as const,
     aboutTag:'About Me',
     eduTitle:'Education', eduSpan:'& Training', eduTag:'academic background',
     certTitle:'Certifications', certSpan:'& Awards', certTag:'achievements',
@@ -22,8 +23,7 @@ const TX = {
     statsLabels:['Projects','Certifications','Years','Graduating'],
   },
   ar: {
-    nav:[['/','الرئيسية'],['/about','عني'],['/#projects','المشاريع'],['/#courses','الكورسات'],['/articles','المقالات'],['/#contact','تواصل']] as [string,string][],
-    langBtn:'English', dir:'rtl',
+    dir:'rtl' as const,
     aboutTag:'عني',
     eduTitle:'التعليم', eduSpan:'والتدريب', eduTag:'academic background',
     certTitle:'الشهادات', certSpan:'والإنجازات', certTag:'achievements',
@@ -32,7 +32,6 @@ const TX = {
   },
 };
 
-// fallbacks
 const FALLBACK_EDU = [
   { degree:'BEng (Hons) Software Engineering', school:'University of Bolton', period:'Oct 2022 – Aug 2025', note:'Human-Centered Agility' },
   { degree:'L4/L5 HND Computer Science', school:'NCC Education', period:'Oct 2022 – Jun 2024', note:'' },
@@ -51,28 +50,26 @@ const FALLBACK_SKILLS = [
 ];
 
 export default function AboutPage() {
-  const [lang,     setLang]     = useState<'en'|'ar'>('en');
-  const [mounted,  setMounted]  = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const [name,       setName]       = useState('Shaimaa Kalel');
-  const [nameAr,     setNameAr]     = useState('شيماء خليل');
-  const [titleEn,    setTitleEn]    = useState('Software Engineer · Human-Centered Agility · Content Creator');
-  const [titleAr,    setTitleAr]    = useState('مهندسة برمجيات · Human-Centered Agility · صانعة محتوى');
-  const [bioEn,      setBioEn]      = useState('Combining Technical Skills with an Agile Mindset to build real systems that serve real people. Passionate about creating healthier, more human tech teams.');
-  const [bioAr,      setBioAr]      = useState('أجمع بين Technical Skills والـ Agile Mindset لأبني أنظمة حقيقية تخدم ناس حقيقيين. شغوفة ببناء فرق تقنية أكثر صحة وإنسانية.');
-  const [location,   setLocation]   = useState('Abu Dhabi, UAE');
-  const [university, setUniversity] = useState('University of Bolton');
-  const [statsProj,  setStatsProj]  = useState('12+');
-  const [statsCerts, setStatsCerts] = useState('8+');
-  const [statsYears, setStatsYears] = useState('3+');
-  const [statsGrad,  setStatsGrad]  = useState('2025');
+  const [lang,      setLang]      = useState<Lang>('en');
+  const [mounted,   setMounted]   = useState(false);
+  const [name,      setName]      = useState('Shaimaa Kalel');
+  const [nameAr,    setNameAr]    = useState('شيماء خليل');
+  const [titleEn,   setTitleEn]   = useState('Software Engineer · Human-Centered Agility · Content Creator');
+  const [titleAr,   setTitleAr]   = useState('مهندسة برمجيات · Human-Centered Agility · صانعة محتوى');
+  const [bioEn,     setBioEn]     = useState('Combining Technical Skills with an Agile Mindset to build real systems that serve real people.');
+  const [bioAr,     setBioAr]     = useState('أجمع بين Technical Skills والـ Agile Mindset لأبني أنظمة حقيقية تخدم ناس حقيقيين.');
+  const [location,  setLocation]  = useState('Abu Dhabi, UAE');
+  const [university,setUniversity]= useState('University of Bolton');
+  const [statsProj, setStatsProj] = useState('12+');
+  const [statsCerts,setStatsCerts]= useState('8+');
+  const [statsYears,setStatsYears]= useState('3+');
+  const [statsGrad, setStatsGrad] = useState('2025');
   const [edu,    setEdu]    = useState(FALLBACK_EDU);
   const [certs,  setCerts]  = useState(FALLBACK_CERTS);
   const [skills, setSkills] = useState(FALLBACK_SKILLS);
 
   useEffect(() => {
-    const s = localStorage.getItem('lang') as 'en'|'ar';
+    const s = localStorage.getItem('lang') as Lang;
     if (s==='ar'||s==='en') setLang(s);
     setMounted(true);
   }, []);
@@ -86,18 +83,17 @@ export default function AboutPage() {
 
   useEffect(() => {
     async function load() {
-      // load about/main
       const d = await getDoc(doc(db,'about','main'));
       if (d.exists()) {
         const data = d.data();
-        if (data.name)          setName(data.name);
-        if (data.nameAr)        setNameAr(data.nameAr);
-        if (data.titleEn)       setTitleEn(data.titleEn);
-        if (data.titleAr)       setTitleAr(data.titleAr);
-        if (data.bioEn)         setBioEn(data.bioEn);
-        if (data.bioAr)         setBioAr(data.bioAr);
-        if (data.location)      setLocation(data.location);
-        if (data.university)    setUniversity(data.university);
+        if (data.name)           setName(data.name);
+        if (data.nameAr)         setNameAr(data.nameAr);
+        if (data.titleEn)        setTitleEn(data.titleEn);
+        if (data.titleAr)        setTitleAr(data.titleAr);
+        if (data.bioEn)          setBioEn(data.bioEn);
+        if (data.bioAr)          setBioAr(data.bioAr);
+        if (data.location)       setLocation(data.location);
+        if (data.university)     setUniversity(data.university);
         if (data.stats_projects) setStatsProj(data.stats_projects);
         if (data.stats_certs)    setStatsCerts(data.stats_certs);
         if (data.stats_years)    setStatsYears(data.stats_years);
@@ -106,7 +102,6 @@ export default function AboutPage() {
         if (data.certs?.length)  setCerts(data.certs);
         if (data.skills?.length) setSkills(data.skills);
       } else {
-        // fallback: count from projects collection
         const proj = await getDocs(collection(db,'projects'));
         setStatsProj(`${proj.size}+`);
       }
@@ -114,9 +109,10 @@ export default function AboutPage() {
     load();
   }, []);
 
-  const L = TX[lang];
-  const eyebrow:React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
-  const rule:React.CSSProperties    = {width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`};
+  const L  = TX[lang];
+  const LN = LANG[lang]; // for Navbar
+  const eyebrow: React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
+  const rule: React.CSSProperties    = {width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`};
 
   if (!mounted) return (
     <main style={{minHeight:'100vh',background:T.bg,display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -131,11 +127,7 @@ export default function AboutPage() {
   return (
     <>
       <style>{`
-        .ab-desktop { display:flex !important; }
-        .ab-burger   { display:none !important; }
         @media(max-width:768px){
-          .ab-desktop  { display:none !important; }
-          .ab-burger   { display:flex !important; }
           .about-hero  { grid-template-columns:1fr !important; gap:2rem !important; }
           .stats-grid  { grid-template-columns:repeat(2,1fr) !important; }
           .about-sec   { padding:4rem 1.25rem !important; }
@@ -145,46 +137,13 @@ export default function AboutPage() {
         }
       `}</style>
 
-      <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir as 'ltr'|'rtl'}}>
+      <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir}}>
 
-        {/* NAV */}
-        <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:1000,background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
-          <div style={{padding:'.9rem 1.5rem',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-            <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,textDecoration:'none',fontWeight:700,flexShrink:0}}>♥ Shaimaa Kalel</Link>
-            <div className="ab-desktop" style={{gap:'1.4rem',alignItems:'center'}}>
-              {L.nav.map(([h,l])=>(
-                <a key={h} href={h} style={{color:T.text2,textDecoration:'none',fontSize:'.88rem',fontWeight:600,whiteSpace:'nowrap',transition:'color .2s'}}
-                  onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
-                  onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>{l}</a>
-              ))}
-              <button onClick={()=>setLang(lang==='en'?'ar':'en')}
-                style={{padding:'.38rem .9rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.8rem',fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}>
-                {L.langBtn}
-              </button>
-            </div>
-            <button className="ab-burger" onClick={()=>setMenuOpen(!menuOpen)}
-              style={{flexDirection:'column',gap:5,background:'none',border:'none',cursor:'pointer',padding:6,flexShrink:0}}>
-              <span style={{width:22,height:2,background:menuOpen?T.goldL:T.text2,display:'block',transition:'all .3s',transform:menuOpen?'rotate(45deg) translate(5px,5px)':'none'}}/>
-              <span style={{width:22,height:2,background:menuOpen?T.goldL:T.text2,display:'block',transition:'all .3s',opacity:menuOpen?0:1}}/>
-              <span style={{width:22,height:2,background:menuOpen?T.goldL:T.text2,display:'block',transition:'all .3s',transform:menuOpen?'rotate(-45deg) translate(5px,-5px)':'none'}}/>
-            </button>
-          </div>
-          {menuOpen && (
-            <div style={{borderTop:`1px solid ${T.border}`,padding:'1rem 1.5rem 1.5rem',display:'flex',flexDirection:'column',gap:'.65rem'}}>
-              {L.nav.map(([h,l])=>(
-                <a key={h} href={h} onClick={()=>setMenuOpen(false)}
-                  style={{color:T.text2,textDecoration:'none',fontSize:'1rem',fontWeight:600,padding:'.5rem 0',borderBottom:`1px solid rgba(200,158,72,0.08)`}}>{l}</a>
-              ))}
-              <button onClick={()=>{setLang(lang==='en'?'ar':'en');setMenuOpen(false);}}
-                style={{marginTop:'.5rem',padding:'.65rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:10,color:T.gold,fontSize:'.9rem',fontWeight:700,cursor:'pointer'}}>
-                {L.langBtn}
-              </button>
-            </div>
-          )}
-        </nav>
+        {/* ── SHARED NAVBAR ── */}
+        <Navbar lang={lang} L={LN} onLangChange={setLang} />
 
         {/* HERO */}
-        <section style={{padding:'9rem 2rem 6rem',position:'relative',overflow:'hidden'}}>
+        <section style={{padding:'9rem 3rem 6rem',position:'relative',overflow:'hidden'}}>
           <div style={{position:'absolute',width:700,height:700,borderRadius:'50%',background:'radial-gradient(circle,rgba(138,31,50,0.4) 0%,transparent 65%)',top:-200,right:-150,pointerEvents:'none'}}/>
           <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(rgba(200,158,72,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,158,72,0.03) 1px,transparent 1px)`,backgroundSize:'70px 70px',pointerEvents:'none'}}/>
           <div style={{maxWidth:1050,margin:'0 auto',position:'relative',zIndex:1}}>
@@ -219,9 +178,10 @@ export default function AboutPage() {
         </section>
 
         {/* EDUCATION */}
-        <section className="about-sec" style={{padding:'6rem 2rem',background:T.bg2}}>
+        <section className="about-sec" style={{padding:'6rem 3rem',background:T.bg2}}>
           <div style={{maxWidth:1050,margin:'0 auto'}}>
-            <div style={{marginBottom:'3rem'}}><span style={eyebrow}>{L.eduTag}</span>
+            <div style={{marginBottom:'3rem'}}>
+              <span style={eyebrow}>{L.eduTag}</span>
               <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.6rem,4vw,2.2rem)',fontWeight:900,color:T.white}}>{L.eduTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.eduSpan}</span></h2>
               <div style={rule}/>
             </div>
@@ -241,9 +201,10 @@ export default function AboutPage() {
         </section>
 
         {/* CERTIFICATIONS */}
-        <section className="about-sec" style={{padding:'6rem 2rem',background:T.bg}}>
+        <section className="about-sec" style={{padding:'6rem 3rem',background:T.bg}}>
           <div style={{maxWidth:1050,margin:'0 auto'}}>
-            <div style={{marginBottom:'3rem'}}><span style={eyebrow}>{L.certTag}</span>
+            <div style={{marginBottom:'3rem'}}>
+              <span style={eyebrow}>{L.certTag}</span>
               <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.6rem,4vw,2.2rem)',fontWeight:900,color:T.white}}>{L.certTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.certSpan}</span></h2>
               <div style={rule}/>
             </div>
@@ -259,9 +220,10 @@ export default function AboutPage() {
         </section>
 
         {/* SKILLS */}
-        <section className="about-sec" style={{padding:'6rem 2rem',background:T.bg2}}>
+        <section className="about-sec" style={{padding:'6rem 3rem',background:T.bg2}}>
           <div style={{maxWidth:1050,margin:'0 auto'}}>
-            <div style={{marginBottom:'3rem'}}><span style={eyebrow}>{L.skillTag}</span>
+            <div style={{marginBottom:'3rem'}}>
+              <span style={eyebrow}>{L.skillTag}</span>
               <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.6rem,4vw,2.2rem)',fontWeight:900,color:T.white}}>{L.skillTitle} <span style={{color:T.gold,fontStyle:'italic'}}>{L.skillSpan}</span></h2>
               <div style={rule}/>
             </div>
@@ -281,7 +243,7 @@ export default function AboutPage() {
         </section>
 
         <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted}}>
-          Made with <span style={{color:T.gold}}>&#9829;</span> by{' '}
+          Made with <span style={{color:T.gold}}>♥</span> by{' '}
           <span style={{color:T.goldL,fontWeight:700}}>Shaimaa Kalel</span>
           {' '}· Software Engineer · Content Creator · Abu Dhabi · 2025
         </footer>
