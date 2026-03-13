@@ -5,6 +5,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { LANG, T } from '../lib/constants';
 import type { Lang, Project } from '../lib/constants';
 import Navbar from '../components/Navbar';
+import Link from 'next/link';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -86,25 +87,45 @@ export default function ProjectsPage() {
 
           <div className="proj-grid" style={{display:'grid',gap:'1.5rem'}}>
             {filtered.map(p => (
-              <div key={p.id} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden',display:'flex',flexDirection:'column',transition:'all .3s'}}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLDivElement;el.style.transform='translateY(-4px)';el.style.borderColor='rgba(201,160,72,0.5)';el.style.boxShadow='0 24px 60px rgba(0,0,0,0.6)';}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLDivElement;el.style.transform='translateY(0)';el.style.borderColor=T.border;el.style.boxShadow='none';}}>
-                <div style={{height:120,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                  <div style={{padding:'.4rem .9rem',background:'rgba(255,255,255,0.06)',border:`1px solid ${T.border}`,borderRadius:8}}>
-                    <span style={{fontFamily:'monospace',color:T.goldL,fontWeight:700,fontSize:'.85rem',letterSpacing:2}}>{p.category.toUpperCase().slice(0,4)}</span>
+              <Link key={p.id} href={`/projects/${p.id}`} style={{textDecoration:'none'}}> 
+                <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden',display:'flex',flexDirection:'column',transition:'all .3s',height:'100%'}}
+                  onMouseEnter={e=>{const el=e.currentTarget as HTMLDivElement;el.style.transform='translateY(-4px)';el.style.borderColor='rgba(201,160,72,0.5)';el.style.boxShadow='0 24px 60px rgba(0,0,0,0.6)';}}
+                  onMouseLeave={e=>{const el=e.currentTarget as HTMLDivElement;el.style.transform='translateY(0)';el.style.borderColor=T.border;el.style.boxShadow='none';}}>
+
+                  {/* IMAGE or gradient placeholder */}
+                  {p.imageUrl ? (
+                    <div style={{height:180,overflow:'hidden'}}>
+                      <img src={p.imageUrl} alt={p.title} style={{width:'100%',height:'100%',objectFit:'cover',display:'block',transition:'transform .4s'}}
+                        onMouseEnter={e=>(e.currentTarget.style.transform='scale(1.05)')}
+                        onMouseLeave={e=>(e.currentTarget.style.transform='scale(1)')}/>
+                    </div>
+                  ) : (
+                    <div style={{height:120,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      <div style={{padding:'.4rem .9rem',background:'rgba(255,255,255,0.06)',border:`1px solid ${T.border}`,borderRadius:8}}>
+                        <span style={{fontFamily:'monospace',color:T.goldL,fontWeight:700,fontSize:'.85rem',letterSpacing:2}}>{p.category.toUpperCase().slice(0,4)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{padding:'1.25rem',flex:1,display:'flex',flexDirection:'column'}}>
+                    <div style={{fontSize:'.65rem',color:T.rose,letterSpacing:2,textTransform:'uppercase',marginBottom:'.35rem',fontFamily:'Playfair Display,serif'}}>{p.category}</div>
+                    <div style={{fontWeight:700,fontSize:'1rem',color:T.white,marginBottom:'.3rem',lineHeight:1.4}}>{p.title}</div>
+                    <div style={{fontSize:'.8rem',color:T.gold,fontWeight:600,marginBottom:'.6rem'}}>{p.stack}</div>
+                    <div style={{fontSize:'.85rem',color:T.text2,lineHeight:1.9,flex:1,marginBottom:'.9rem'}}>{lang==='ar'?p.desc_ar||p.desc:p.desc_en||p.desc}</div>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'.7rem',borderTop:`1px solid rgba(200,158,72,0.12)`}}>
+                      <div style={{display:'flex',gap:'.9rem'}}>
+                        {p.github && <a href={p.github} target="_blank" rel="noopener" onClick={e=>e.stopPropagation()} style={{fontSize:'.8rem',color:T.gold,textDecoration:'none',fontWeight:700}}>{L.githubLbl}</a>}
+                        {p.demo   && <a href={p.demo}   target="_blank" rel="noopener" onClick={e=>e.stopPropagation()} style={{fontSize:'.8rem',color:T.gold,textDecoration:'none',fontWeight:700}}>{L.demoLbl}</a>}
+                      </div>
+                      <div style={{display:'flex',gap:'.5rem',alignItems:'center'}}>
+                        {(p.images?.length||0) > 1 && <span style={{fontSize:'.72rem',color:T.muted}}>🖼 {p.images?.length}</span>}
+                        {(p.pdfs?.length||0) > 0 && <span style={{fontSize:'.72rem',color:T.muted}}>📄 {p.pdfs?.length}</span>}
+                        <span style={{fontSize:'.8rem',color:T.text2,fontWeight:600}}>→</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div style={{padding:'1.25rem',flex:1,display:'flex',flexDirection:'column'}}>
-                  <div style={{fontSize:'.65rem',color:T.rose,letterSpacing:2,textTransform:'uppercase',marginBottom:'.35rem',fontFamily:'Playfair Display,serif'}}>{p.category}</div>
-                  <div style={{fontWeight:700,fontSize:'1rem',color:T.white,marginBottom:'.3rem',lineHeight:1.4}}>{p.title}</div>
-                  <div style={{fontSize:'.8rem',color:T.gold,fontWeight:600,marginBottom:'.6rem'}}>{p.stack}</div>
-                  <div style={{fontSize:'.85rem',color:T.text2,lineHeight:1.9,flex:1,marginBottom:'.9rem'}}>{lang==='ar'?p.desc_ar||p.desc:p.desc_en||p.desc}</div>
-                  <div style={{display:'flex',gap:'.9rem',paddingTop:'.7rem',borderTop:`1px solid rgba(200,158,72,0.12)`}}>
-                    {p.github && <a href={p.github} target="_blank" rel="noopener" style={{fontSize:'.8rem',color:T.gold,textDecoration:'none',fontWeight:700}}>{L.githubLbl}</a>}
-                    {p.demo   && <a href={p.demo}   target="_blank" rel="noopener" style={{fontSize:'.8rem',color:T.gold,textDecoration:'none',fontWeight:700}}>{L.demoLbl}</a>}
-                  </div>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
