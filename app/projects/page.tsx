@@ -2,11 +2,9 @@
 import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
-import { LANG } from '../lib/constants';
+import { LANG, T } from '../lib/constants';
 import type { Lang, Project } from '../lib/constants';
 import Navbar from '../components/Navbar';
-import { T } from '../lib/constants';
-import Link from 'next/link';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -32,10 +30,8 @@ export default function ProjectsPage() {
       .then(s => setProjects(s.docs.map(d=>({id:d.id,...d.data()} as Project))));
   }, []);
 
-  const L  = LANG[lang];
-  const LN = LANG[lang];
+  const L = LANG[lang];
   const filtered = filter==='all' ? projects : projects.filter(p=>p.category===filter);
-
   const eyebrow: React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
 
   if (!mounted) return (
@@ -47,18 +43,22 @@ export default function ProjectsPage() {
   return (
     <>
       <style>{`
+        .proj-hero    { padding: 9rem 3rem 4rem !important; }
+        .proj-content { padding: 3rem 3rem 6rem !important; max-width: 1050px; margin: 0 auto; }
+        .proj-grid    { grid-template-columns: repeat(auto-fill,minmax(300px,1fr)) !important; }
         @media(max-width:768px){
-          .proj-hero { padding: 7rem 1.25rem 3rem !important; }
-          .proj-grid { grid-template-columns: 1fr !important; padding: 2rem 1.25rem 5rem !important; }
+          .proj-hero    { padding: 7rem 1.25rem 3rem !important; }
+          .proj-content { padding: 2rem 1.25rem 5rem !important; }
+          .proj-grid    { grid-template-columns: 1fr !important; gap: 1rem !important; }
+          .proj-filters { gap: .4rem !important; }
           .proj-filters button { padding: .4rem .75rem !important; font-size: .78rem !important; }
         }
       `}</style>
 
       <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir}}>
-        <Navbar lang={lang} L={LN} onLangChange={setLang} />
+        <Navbar lang={lang} L={L} onLangChange={setLang} />
 
-        {/* HERO */}
-        <section className="proj-hero" style={{padding:'9rem 3rem 4rem',position:'relative',overflow:'hidden',background:T.bg2}}>
+        <section className="proj-hero" style={{position:'relative',overflow:'hidden',background:T.bg2}}>
           <div style={{position:'absolute',width:600,height:600,borderRadius:'50%',background:'radial-gradient(circle,rgba(138,31,50,0.35) 0%,transparent 65%)',top:-200,right:-150,pointerEvents:'none'}}/>
           <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(${T.border} 1px,transparent 1px),linear-gradient(90deg,${T.border} 1px,transparent 1px)`,backgroundSize:'70px 70px',opacity:.3,pointerEvents:'none'}}/>
           <div style={{maxWidth:1050,margin:'0 auto',position:'relative',zIndex:1}}>
@@ -70,8 +70,7 @@ export default function ProjectsPage() {
           </div>
         </section>
 
-        {/* FILTERS + GRID */}
-        <div style={{maxWidth:1050,margin:'0 auto',padding:'3rem 3rem 6rem'}}>
+        <div className="proj-content">
           <div className="proj-filters" style={{display:'flex',gap:'.55rem',flexWrap:'wrap',marginBottom:'2rem'}}>
             {L.filters.map(([v,l]) => (
               <button key={v} onClick={()=>setFilter(v)}
@@ -85,12 +84,12 @@ export default function ProjectsPage() {
             <p style={{color:T.muted,textAlign:'center',padding:'4rem'}}>{L.noProj}</p>
           )}
 
-          <div className="proj-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:'1.5rem'}}>
+          <div className="proj-grid" style={{display:'grid',gap:'1.5rem'}}>
             {filtered.map(p => (
               <div key={p.id} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden',display:'flex',flexDirection:'column',transition:'all .3s'}}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLDivElement;el.style.transform='translateY(-6px)';el.style.borderColor='rgba(201,160,72,0.5)';el.style.boxShadow='0 24px 60px rgba(0,0,0,0.6)';}}
+                onMouseEnter={e=>{const el=e.currentTarget as HTMLDivElement;el.style.transform='translateY(-4px)';el.style.borderColor='rgba(201,160,72,0.5)';el.style.boxShadow='0 24px 60px rgba(0,0,0,0.6)';}}
                 onMouseLeave={e=>{const el=e.currentTarget as HTMLDivElement;el.style.transform='translateY(0)';el.style.borderColor=T.border;el.style.boxShadow='none';}}>
-                <div style={{height:130,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <div style={{height:120,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
                   <div style={{padding:'.4rem .9rem',background:'rgba(255,255,255,0.06)',border:`1px solid ${T.border}`,borderRadius:8}}>
                     <span style={{fontFamily:'monospace',color:T.goldL,fontWeight:700,fontSize:'.85rem',letterSpacing:2}}>{p.category.toUpperCase().slice(0,4)}</span>
                   </div>
