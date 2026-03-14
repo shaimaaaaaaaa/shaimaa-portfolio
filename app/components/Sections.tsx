@@ -233,11 +233,11 @@ export function ContactSection({ L, lang }: ContactProps) {
 }
 
 // ═══════════════════════════════
-//  FOOTER
+//  FOOTER — 3 columns
 // ═══════════════════════════════
-interface FooterProps { L: LangData; }
+interface FooterProps { L: LangData; lang?: Lang; }
 
-export function Footer({ L: _L }: FooterProps) {
+export function Footer({ L: _L, lang = 'en' }: FooterProps) {
   const [clicks, setClicks] = useState(0);
   const [timer,  setTimer]  = useState<ReturnType<typeof setTimeout>|null>(null);
 
@@ -247,70 +247,149 @@ export function Footer({ L: _L }: FooterProps) {
     if (timer) clearTimeout(timer);
     const t = setTimeout(() => setClicks(0), 1500);
     setTimer(t);
-    if (next >= 3) {
-      setClicks(0);
-      window.location.href = '/admin/login';
-    }
+    if (next >= 3) { setClicks(0); window.location.href = '/admin/login'; }
   }
+
+  const quickLinks = lang === 'ar'
+    ? [['/','الرئيسية'],['/about','عني'],['/projects','المشاريع'],['/courses','الكورسات'],['/articles','المقالات'],['/#contact','تواصل']]
+    : [['/',  'Home'],['/about','About'],['/projects','Projects'],['/courses','Courses'],['/articles','Articles'],['/#contact','Contact']];
+
+  const social = [
+    { label:'LinkedIn', href:'https://www.linkedin.com/in/shaimaakalel',       icon:'in' },
+    { label:'GitHub',   href:'https://github.com/shaimaaaaaaaa',               icon:'gh' },
+    { label:'Instagram',href:'https://instagram.com/shaimaa_agile',            icon:'ig' },
+    { label:'YouTube',  href:'https://youtube.com/@ShaimaasAgileStories',      icon:'yt' },
+    { label:'TikTok',   href:'https://tiktok.com/@shaimaa_agile',              icon:'tt' },
+    { label:'Email',    href:'mailto:shaimaakalel@gmail.com',                  icon:'✉'  },
+  ];
+
+  const bio = lang === 'ar'
+    ? 'مهندسة برمجيات وصانعة محتوى من أبوظبي. أجمع بين التقنية وعقلية Agile لبناء أنظمة تخدم الناس.'
+    : 'Software Engineer & Content Creator based in Abu Dhabi. Combining technical skills with an Agile mindset.';
+
+  const colTitle = (txt: string) => (
+    <div style={{fontFamily:'Playfair Display,serif',fontSize:'.78rem',fontWeight:700,color:T.gold,letterSpacing:3,textTransform:'uppercase',marginBottom:'1.25rem'}}>{txt}</div>
+  );
 
   return (
     <>
       <style>{`
-        /* ── view-all links ── */
         .link-hover {
           font-size:.88rem; color:#c9a048; font-weight:700;
-          text-decoration:none;
-          padding:.38rem .85rem;
-          border:1px solid transparent;
-          border-radius:20px;
-          transition: color .2s, border-color .2s, background .2s, box-shadow .2s;
+          text-decoration:none; padding:.38rem .85rem;
+          border:1px solid transparent; border-radius:20px; display:inline-block;
+          transition:color .2s, border-color .2s, background .2s, box-shadow .2s;
         }
-        .link-hover:hover {
-          color:#0e0608 !important;
-          background:#c9a048;
-          border-color:#c9a048;
-          box-shadow: 0 4px 18px rgba(201,160,72,0.45);
+        .link-hover:hover { color:#0e0608 !important; background:#c9a048; border-color:#c9a048; box-shadow:0 4px 18px rgba(201,160,72,0.45); }
+        .card-hover { transition:transform .28s, border-color .28s, box-shadow .28s !important; }
+        .card-hover:hover { transform:translateY(-7px) scale(1.01) !important; border-color:#c9a048 !important; box-shadow:0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,160,72,0.3) !important; }
+        .edu-card { transition:border-color .22s, background .22s, box-shadow .22s !important; }
+        .edu-card:hover { border-color:#c9a048 !important; background:rgba(201,160,72,0.07) !important; box-shadow:0 4px 24px rgba(201,160,72,0.15) !important; }
+        .social-btn { transition:border-color .2s, color .2s, background .2s, transform .18s, box-shadow .2s !important; }
+        .social-btn:hover { border-color:#c9a048 !important; color:#0e0608 !important; background:#c9a048 !important; transform:translateY(-3px) !important; box-shadow:0 8px 22px rgba(201,160,72,0.4) !important; }
+
+        .footer-quick-link {
+          color:#8a7268; text-decoration:none; font-size:.88rem; font-weight:500;
+          padding:.3rem 0; display:block;
+          transition:color .2s, padding-left .2s;
+        }
+        .footer-quick-link:hover { color:#c9a048 !important; padding-left:.4rem; }
+
+        .footer-social-btn {
+          display:inline-flex; align-items:center; justify-content:center;
+          width:38px; height:38px; border-radius:10px;
+          background:rgba(255,255,255,0.04); border:1px solid rgba(200,158,72,0.2);
+          color:#8a7268; font-size:.78rem; font-weight:700; text-decoration:none;
+          transition:background .2s, border-color .2s, color .2s, transform .18s, box-shadow .2s;
+        }
+        .footer-social-btn:hover {
+          background:#c9a048 !important; border-color:#c9a048 !important;
+          color:#0e0608 !important; transform:translateY(-3px);
+          box-shadow:0 8px 20px rgba(201,160,72,0.4);
         }
 
-        /* ── cards ── */
-        .card-hover {
-          transition: transform .28s, border-color .28s, box-shadow .28s;
+        .footer-cols {
+          display:grid; grid-template-columns:2fr 1fr 1fr; gap:3rem;
         }
-        .card-hover:hover {
-          transform: translateY(-7px) scale(1.01);
-          border-color: #c9a048 !important;
-          box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,160,72,0.3);
+        @media(max-width:768px){
+          .footer-cols { grid-template-columns:1fr 1fr !important; gap:2rem !important; }
+          .footer-cols > div:first-child { grid-column:1/-1; }
         }
-
-        /* ── edu rows ── */
-        .edu-card {
-          transition: border-color .22s, background .22s, box-shadow .22s;
-        }
-        .edu-card:hover {
-          border-color: #c9a048 !important;
-          background: rgba(201,160,72,0.07) !important;
-          box-shadow: 0 4px 24px rgba(201,160,72,0.15);
-        }
-
-        /* ── social buttons ── */
-        .social-btn {
-          transition: border-color .2s, color .2s, background .2s, transform .18s, box-shadow .2s;
-        }
-        .social-btn:hover {
-          border-color: #c9a048 !important;
-          color: #0e0608 !important;
-          background: #c9a048 !important;
-          transform: translateY(-3px);
-          box-shadow: 0 8px 22px rgba(201,160,72,0.4);
+        @media(max-width:480px){
+          .footer-cols { grid-template-columns:1fr !important; }
         }
       `}</style>
 
-      <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted,lineHeight:1.8}}>
-        Made with{' '}
-        <span onClick={handleHeartClick} style={{color:T.gold,cursor:'pointer',fontSize:clicks>0?'1.1rem':'1rem',transition:'font-size .15s'}}>♥</span>
-        {' '}by{' '}
-        <span style={{color:T.goldL,fontWeight:700}}>Shaimaa Kalel</span>
-        {' '}· Software Engineer · Content Creator · Abu Dhabi · 2026
+      <footer style={{background:T.bg2,borderTop:`1px solid ${T.border}`,paddingTop:'3.5rem'}}>
+        <div style={{maxWidth:1050,margin:'0 auto',padding:'0 2rem 2.5rem'}}>
+
+          {/* 3 COLUMNS */}
+          <div className="footer-cols">
+
+            {/* col 1 — brand + bio + social icons */}
+            <div>
+              <a href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.3rem',color:T.goldL,fontWeight:700,letterSpacing:1,textDecoration:'none',display:'block',marginBottom:'1rem'}}>
+                ♥ Shaimaa Kalel
+              </a>
+              <p style={{fontSize:'.88rem',color:T.muted,lineHeight:1.9,marginBottom:'1.5rem',maxWidth:280}}>{bio}</p>
+              <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
+                {social.map(s=>(
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener"
+                    className="footer-social-btn" title={s.label}>{s.icon}</a>
+                ))}
+              </div>
+            </div>
+
+            {/* col 2 — quick links */}
+            <div>
+              {colTitle(lang==='ar'?'روابط سريعة':'Quick Links')}
+              <div style={{display:'flex',flexDirection:'column',gap:'.1rem'}}>
+                {quickLinks.map(([href,label])=>(
+                  <a key={href} href={href} className="footer-quick-link">{label}</a>
+                ))}
+              </div>
+            </div>
+
+            {/* col 3 — contact info */}
+            <div>
+              {colTitle(lang==='ar'?'تواصل':'Contact')}
+              <div style={{display:'flex',flexDirection:'column',gap:'.85rem'}}>
+                <div>
+                  <div style={{fontSize:'.78rem',color:T.text2,fontWeight:600,marginBottom:'.25rem'}}>📍 {lang==='ar'?'الموقع':'Location'}</div>
+                  <div style={{fontSize:'.85rem',color:T.muted}}>Abu Dhabi, UAE</div>
+                </div>
+                <div>
+                  <div style={{fontSize:'.78rem',color:T.text2,fontWeight:600,marginBottom:'.25rem'}}>✉ Email</div>
+                  <a href="mailto:shaimaakalel@gmail.com" className="footer-quick-link" style={{padding:0,fontSize:'.82rem'}}>
+                    shaimaakalel@gmail.com
+                  </a>
+                </div>
+                <div>
+                  <div style={{fontSize:'.78rem',color:T.text2,fontWeight:600,marginBottom:'.25rem'}}>🎓 {lang==='ar'?'الجامعة':'University'}</div>
+                  <div style={{fontSize:'.85rem',color:T.muted}}>University of Bolton</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* DIVIDER */}
+          <div style={{height:1,background:`linear-gradient(90deg,transparent,${T.border},transparent)`,margin:'2.5rem 0 1.5rem'}}/>
+
+          {/* BOTTOM ROW */}
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'1rem'}}>
+            <p style={{fontSize:'.78rem',color:T.muted}}>
+              © 2026 <span style={{color:T.text2,fontWeight:600}}>Shaimaa Kalel</span>
+              {' '}· {lang==='ar'?'جميع الحقوق محفوظة':'All rights reserved'}
+            </p>
+            <p style={{fontSize:'.75rem',color:T.muted}}>
+              Made with{' '}
+              <span onClick={handleHeartClick}
+                style={{color:T.gold,cursor:'pointer',fontSize:clicks>0?'1.1rem':'1rem',transition:'font-size .15s'}}>♥</span>
+              {' '}by Shaimaa Kalel
+            </p>
+          </div>
+
+        </div>
       </footer>
     </>
   );

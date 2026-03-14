@@ -88,7 +88,7 @@ export default function Home() {
         <CoursesSection   L={L} lang={lang} courses={courses} showViewAll={true} />
         <ArticlesSection  L={L} lang={lang} articles={articles} />
         <ContactSection   L={L} lang={lang} />
-        <Footer L={L} />
+        <Footer L={L} lang={lang} />
       </main>
     </>
   );
