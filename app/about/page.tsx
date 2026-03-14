@@ -56,6 +56,25 @@ const FALLBACK_SKILLS: SkillCat[] = [
   { cat_en:'Design & Analysis', cat_ar:'التصميم والتحليل', items:'ERD,DFD,UI/UX Design,Agile Leadership' },
 ];
 
+// ── Lightbox ──
+function Lightbox({ src, alt, onClose }: { src:string; alt:string; onClose:()=>void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key==='Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow=''; };
+  }, [onClose]);
+
+  return (
+    <div onClick={onClose} style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.93)',display:'flex',alignItems:'center',justifyContent:'center',padding:'1.5rem',cursor:'zoom-out'}}>
+      <button onClick={onClose} style={{position:'absolute',top:'1.25rem',right:'1.25rem',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',borderRadius:'50%',width:40,height:40,color:'#fff',fontSize:'1.1rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+      <img src={src} alt={alt} onClick={e=>e.stopPropagation()}
+        style={{maxWidth:'90vw',maxHeight:'88vh',objectFit:'contain',borderRadius:12,boxShadow:'0 30px 80px rgba(0,0,0,0.8)',cursor:'default',border:'1px solid rgba(200,158,72,0.2)'}}/>
+      <div style={{position:'absolute',bottom:'1.5rem',left:0,right:0,textAlign:'center',fontSize:'.85rem',color:'rgba(255,255,255,0.45)',pointerEvents:'none'}}>{alt}</div>
+    </div>
+  );
+}
+
 export default function AboutPage() {
   const [lang,      setLang]      = useState<Lang>('en');
   const [mounted,   setMounted]   = useState(false);
@@ -74,6 +93,8 @@ export default function AboutPage() {
   const [edu,    setEdu]    = useState<EduItem[]>(FALLBACK_EDU);
   const [certs,  setCerts]  = useState<CertItem[]>(FALLBACK_CERTS);
   const [skills, setSkills] = useState<SkillCat[]>(FALLBACK_SKILLS);
+
+  const [lightbox, setLightbox] = useState<{src:string;alt:string}|null>(null);
 
   useEffect(() => {
     const s = localStorage.getItem('lang') as Lang;
@@ -107,7 +128,6 @@ export default function AboutPage() {
         if (data.stats_grad)     setStatsGrad(data.stats_grad);
         if (data.edu?.length)    setEdu(data.edu);
         if (data.certs?.length) {
-          // normalize: support old string[] and new CertItem[]
           const normalized: CertItem[] = data.certs.map((c: string | CertItem) =>
             typeof c === 'string' ? { name: c } : c
           );
@@ -148,7 +168,11 @@ export default function AboutPage() {
           .certs-grid  { grid-template-columns:1fr !important; }
           .skills-grid { grid-template-columns:1fr !important; }
         }
+        .img-clickable { cursor:zoom-in; transition:opacity .2s,transform .2s; }
+        .img-clickable:hover { opacity:.82; transform:scale(1.06); }
       `}</style>
+
+      {lightbox && <Lightbox src={lightbox.src} alt={lightbox.alt} onClose={()=>setLightbox(null)}/>}
 
       <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir}}>
 
@@ -201,10 +225,13 @@ export default function AboutPage() {
               {edu.map((e,i)=>(
                 <div key={i} className="edu-item" style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.4rem 1.6rem',display:'flex',justifyContent:'space-between',alignItems:'center',gap:'1rem'}}>
                   <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
-                    {/* school logo if available */}
                     {e.imageUrl && (
-                      <img src={e.imageUrl} alt={e.school}
-                        style={{width:48,height:48,objectFit:'contain',borderRadius:8,background:'rgba(255,255,255,0.06)',padding:4,flexShrink:0}}/>
+                      <img
+                        src={e.imageUrl} alt={e.school}
+                        className="img-clickable"
+                        onClick={()=>setLightbox({src:e.imageUrl!,alt:e.school})}
+                        style={{width:48,height:48,objectFit:'contain',borderRadius:8,background:'rgba(255,255,255,0.06)',padding:4,flexShrink:0}}
+                      />
                     )}
                     <div>
                       <div style={{fontFamily:'Playfair Display,serif',fontSize:'1rem',fontWeight:700,color:T.white,marginBottom:'.25rem'}}>{e.degree}</div>
@@ -230,10 +257,13 @@ export default function AboutPage() {
             <div className="certs-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:'1rem'}}>
               {certs.map((c,i)=>(
                 <div key={i} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:'1rem 1.25rem',display:'flex',alignItems:'center',gap:'.8rem'}}>
-                  {/* cert image or dot */}
                   {c.imageUrl
-                    ? <img src={c.imageUrl} alt={c.name}
-                        style={{width:40,height:40,objectFit:'contain',borderRadius:6,background:'rgba(255,255,255,0.05)',padding:3,flexShrink:0}}/>
+                    ? <img
+                        src={c.imageUrl} alt={c.name}
+                        className="img-clickable"
+                        onClick={()=>setLightbox({src:c.imageUrl!,alt:c.name})}
+                        style={{width:40,height:40,objectFit:'contain',borderRadius:6,background:'rgba(255,255,255,0.05)',padding:3,flexShrink:0}}
+                      />
                     : <div style={{width:7,height:7,borderRadius:'50%',background:T.gold,flexShrink:0}}/>
                   }
                   <span style={{fontSize:'.85rem',color:T.text2,lineHeight:1.5}}>{c.name}</span>
