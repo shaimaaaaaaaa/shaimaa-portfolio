@@ -32,18 +32,25 @@ const TX = {
   },
 };
 
-const FALLBACK_EDU = [
+interface EduItem  { degree:string; school:string; period:string; note:string; imageUrl?:string; }
+interface CertItem { name:string; imageUrl?:string; }
+interface SkillCat { cat_en:string; cat_ar:string; items:string; }
+
+const FALLBACK_EDU: EduItem[] = [
   { degree:'BEng (Hons) Software Engineering', school:'University of Bolton', period:'Oct 2022 – Aug 2025', note:'Human-Centered Agility' },
   { degree:'L4/L5 HND Computer Science', school:'NCC Education', period:'Oct 2022 – Jun 2024', note:'' },
   { degree:'Agile Software Developer Nanodegree', school:'Udacity', period:'Dec 2023 – Apr 2024', note:'Nanodegree' },
   { degree:'Software Engineering Specialization', school:'HKUST', period:'2024', note:'' },
 ];
-const FALLBACK_CERTS = [
-  'IT Fundamentals — IBM','UI/UX Design — IBM','Front-End Development — IBM',
-  'Intro to Software Engineering — IBM (with Honors)',
-  'Scrum Master — SKILL-UP EDTECH (with Honors)','Software Engineering — HKUST (×3)',
+const FALLBACK_CERTS: CertItem[] = [
+  { name:'IT Fundamentals — IBM' },
+  { name:'UI/UX Design — IBM' },
+  { name:'Front-End Development — IBM' },
+  { name:'Intro to Software Engineering — IBM (with Honors)' },
+  { name:'Scrum Master — SKILL-UP EDTECH (with Honors)' },
+  { name:'Software Engineering — HKUST (×3)' },
 ];
-const FALLBACK_SKILLS = [
+const FALLBACK_SKILLS: SkillCat[] = [
   { cat_en:'Languages & Frameworks', cat_ar:'لغات البرمجة والـ Frameworks', items:'C#,WinForms,SQL,ADO.NET,Laravel,Next.js,Firebase,WordPress' },
   { cat_en:'Agile & Project Management', cat_ar:'Agile وإدارة المشاريع', items:'Scrum,Kanban,DSDM,Jira,Trello' },
   { cat_en:'Design & Analysis', cat_ar:'التصميم والتحليل', items:'ERD,DFD,UI/UX Design,Agile Leadership' },
@@ -64,9 +71,9 @@ export default function AboutPage() {
   const [statsCerts,setStatsCerts]= useState('8+');
   const [statsYears,setStatsYears]= useState('3+');
   const [statsGrad, setStatsGrad] = useState('2025');
-  const [edu,    setEdu]    = useState(FALLBACK_EDU);
-  const [certs,  setCerts]  = useState(FALLBACK_CERTS);
-  const [skills, setSkills] = useState(FALLBACK_SKILLS);
+  const [edu,    setEdu]    = useState<EduItem[]>(FALLBACK_EDU);
+  const [certs,  setCerts]  = useState<CertItem[]>(FALLBACK_CERTS);
+  const [skills, setSkills] = useState<SkillCat[]>(FALLBACK_SKILLS);
 
   useEffect(() => {
     const s = localStorage.getItem('lang') as Lang;
@@ -99,7 +106,13 @@ export default function AboutPage() {
         if (data.stats_years)    setStatsYears(data.stats_years);
         if (data.stats_grad)     setStatsGrad(data.stats_grad);
         if (data.edu?.length)    setEdu(data.edu);
-        if (data.certs?.length)  setCerts(data.certs);
+        if (data.certs?.length) {
+          // normalize: support old string[] and new CertItem[]
+          const normalized: CertItem[] = data.certs.map((c: string | CertItem) =>
+            typeof c === 'string' ? { name: c } : c
+          );
+          setCerts(normalized);
+        }
         if (data.skills?.length) setSkills(data.skills);
       } else {
         const proj = await getDocs(collection(db,'projects'));
@@ -110,7 +123,7 @@ export default function AboutPage() {
   }, []);
 
   const L  = TX[lang];
-  const LN = LANG[lang]; // for Navbar
+  const LN = LANG[lang];
   const eyebrow: React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
   const rule: React.CSSProperties    = {width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`};
 
@@ -139,7 +152,6 @@ export default function AboutPage() {
 
       <main style={{background:T.bg,color:T.text,minHeight:'100vh',fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",direction:L.dir}}>
 
-        {/* ── SHARED NAVBAR ── */}
         <Navbar lang={lang} L={LN} onLangChange={setLang} />
 
         {/* HERO */}
@@ -188,10 +200,17 @@ export default function AboutPage() {
             <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
               {edu.map((e,i)=>(
                 <div key={i} className="edu-item" style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.4rem 1.6rem',display:'flex',justifyContent:'space-between',alignItems:'center',gap:'1rem'}}>
-                  <div>
-                    <div style={{fontFamily:'Playfair Display,serif',fontSize:'1rem',fontWeight:700,color:T.white,marginBottom:'.25rem'}}>{e.degree}</div>
-                    <div style={{fontSize:'.85rem',color:T.gold,fontWeight:600,marginBottom:'.15rem'}}>{e.school}</div>
-                    {e.note && <div style={{fontSize:'.75rem',color:T.rose,letterSpacing:1}}>{e.note}</div>}
+                  <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+                    {/* school logo if available */}
+                    {e.imageUrl && (
+                      <img src={e.imageUrl} alt={e.school}
+                        style={{width:48,height:48,objectFit:'contain',borderRadius:8,background:'rgba(255,255,255,0.06)',padding:4,flexShrink:0}}/>
+                    )}
+                    <div>
+                      <div style={{fontFamily:'Playfair Display,serif',fontSize:'1rem',fontWeight:700,color:T.white,marginBottom:'.25rem'}}>{e.degree}</div>
+                      <div style={{fontSize:'.85rem',color:T.gold,fontWeight:600,marginBottom:'.15rem'}}>{e.school}</div>
+                      {e.note && <div style={{fontSize:'.75rem',color:T.rose,letterSpacing:1}}>{e.note}</div>}
+                    </div>
                   </div>
                   <div style={{fontSize:'.78rem',color:T.muted,flexShrink:0,whiteSpace:'nowrap'}}>{e.period}</div>
                 </div>
@@ -211,8 +230,13 @@ export default function AboutPage() {
             <div className="certs-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:'1rem'}}>
               {certs.map((c,i)=>(
                 <div key={i} style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:'1rem 1.25rem',display:'flex',alignItems:'center',gap:'.8rem'}}>
-                  <div style={{width:7,height:7,borderRadius:'50%',background:T.gold,flexShrink:0}}/>
-                  <span style={{fontSize:'.85rem',color:T.text2,lineHeight:1.5}}>{c}</span>
+                  {/* cert image or dot */}
+                  {c.imageUrl
+                    ? <img src={c.imageUrl} alt={c.name}
+                        style={{width:40,height:40,objectFit:'contain',borderRadius:6,background:'rgba(255,255,255,0.05)',padding:3,flexShrink:0}}/>
+                    : <div style={{width:7,height:7,borderRadius:'50%',background:T.gold,flexShrink:0}}/>
+                  }
+                  <span style={{fontSize:'.85rem',color:T.text2,lineHeight:1.5}}>{c.name}</span>
                 </div>
               ))}
             </div>
