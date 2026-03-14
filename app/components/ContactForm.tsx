@@ -54,59 +54,76 @@ export default function ContactForm({ lang='en' }: { lang?:'en'|'ar' }) {
 
   if (sent) return (
     <div style={{padding:'2rem',background:'rgba(74,222,128,0.08)',border:`1px solid rgba(74,222,128,0.3)`,borderRadius:16,textAlign:'center'}}>
-      <div style={{fontSize:'2rem',marginBottom:'1rem'}}>✓</div>
+      <div style={{fontSize:'2rem',marginBottom:'1rem'}}>♥</div>
       <p style={{color:T.green,fontWeight:700,fontSize:'1rem'}}>{tx.ok}</p>
     </div>
   );
 
   return (
-    <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+    <>
+      <style>{`
+        .contact-submit {
+          width:100%;
+          padding:1rem;
+          background:linear-gradient(135deg,#a02840,#4a0f1c);
+          color:#ffffff;
+          border:1px solid transparent;
+          border-radius:10px;
+          font-weight:700;
+          font-size:1rem;
+          font-family:'IBM Plex Sans Arabic','DM Sans',sans-serif;
+          box-shadow:0 6px 24px rgba(138,31,50,0.4);
+          transition: background .22s, color .22s, border-color .22s, transform .18s, box-shadow .22s;
+        }
+        .contact-submit:not(:disabled):hover {
+          background:linear-gradient(135deg,#c9a048,#a07830) !important;
+          color:#0e0608 !important;
+          border-color:#c9a048;
+          transform:translateY(-2px);
+          box-shadow:0 12px 36px rgba(201,160,72,0.5);
+        }
+        .contact-submit:disabled {
+          opacity:.65;
+        }
+      `}</style>
 
-      {/* NAME — full width */}
-      <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
-        <label style={labelStyle}>{tx.name.toUpperCase()}</label>
-        <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})}
-          placeholder={tx.name} required style={inp}
-          onFocus={e=>(e.target.style.borderColor=T.gold)}
-          onBlur={e=>(e.target.style.borderColor=T.border)}/>
-      </div>
+      <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
 
-      {/* EMAIL — full width */}
-      <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
-        <label style={labelStyle}>{tx.email.toUpperCase()}</label>
-        <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}
-          placeholder={tx.email} required style={{...inp,direction:'ltr'}}
-          onFocus={e=>(e.target.style.borderColor=T.gold)}
-          onBlur={e=>(e.target.style.borderColor=T.border)}/>
-      </div>
+        {/* NAME */}
+        <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
+          <label style={labelStyle}>{tx.name.toUpperCase()}</label>
+          <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})}
+            placeholder={tx.name} required style={inp}
+            onFocus={e=>(e.target.style.borderColor=T.gold)}
+            onBlur={e=>(e.target.style.borderColor=T.border)}/>
+        </div>
 
-      {/* MESSAGE */}
-      <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
-        <label style={labelStyle}>{tx.msg.toUpperCase()}</label>
-        <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})}
-          placeholder={tx.msg} required rows={5}
-          style={{...inp,resize:'vertical'}}
-          onFocus={e=>(e.target.style.borderColor=T.gold)}
-          onBlur={e=>(e.target.style.borderColor=T.border)}/>
-      </div>
+        {/* EMAIL */}
+        <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
+          <label style={labelStyle}>{tx.email.toUpperCase()}</label>
+          <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}
+            placeholder={tx.email} required style={{...inp,direction:'ltr'}}
+            onFocus={e=>(e.target.style.borderColor=T.gold)}
+            onBlur={e=>(e.target.style.borderColor=T.border)}/>
+        </div>
 
-      {error && <p style={{color:T.rose,fontSize:'.88rem',margin:0}}>{error}</p>}
+        {/* MESSAGE */}
+        <div style={{display:'flex',flexDirection:'column',gap:'.4rem'}}>
+          <label style={labelStyle}>{tx.msg.toUpperCase()}</label>
+          <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})}
+            placeholder={tx.msg} required rows={5}
+            style={{...inp,resize:'vertical'}}
+            onFocus={e=>(e.target.style.borderColor=T.gold)}
+            onBlur={e=>(e.target.style.borderColor=T.border)}/>
+        </div>
 
-      {/* BUTTON — full width */}
-      <button type="submit" disabled={sending}
-        style={{
-          width:'100%', padding:'1rem',
-          background:`linear-gradient(135deg,${T.burgL},#4a0f1c)`,
-          color:T.white, border:'none', borderRadius:10,
-          fontWeight:700, fontSize:'1rem',
-          cursor:sending?'not-allowed':'pointer',
-          opacity:sending?.7:1,
-          boxShadow:`0 6px 24px rgba(138,31,50,0.4)`,
-          transition:'all .25s',
-          fontFamily:"'IBM Plex Sans Arabic','DM Sans',sans-serif",
-        }}>
-        {sending ? '...' : tx.btn + ' ✦'}
-      </button>
-    </form>
+        {error && <p style={{color:T.rose,fontSize:'.88rem',margin:0}}>{error}</p>}
+
+        <button type="submit" disabled={sending} className="contact-submit">
+          {sending ? '...' : tx.btn + ' ♥'}
+        </button>
+
+      </form>
+    </>
   );
 }
