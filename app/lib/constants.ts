@@ -81,6 +81,8 @@ export type LangData = typeof LANG['en'] | typeof LANG['ar'];
 
 export interface PdfFile { name: string; url: string; }
 
+export interface CertItem { name: string; imageUrl?: string; }
+
 export interface Project {
   id: string;
   title: string;

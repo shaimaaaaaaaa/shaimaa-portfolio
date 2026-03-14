@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { auth, db } from '../../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
@@ -13,8 +13,12 @@ const T = {
   border:'rgba(200,158,72,0.2)', rose:'#d07080', green:'#4ade80',
 };
 
+const CLOUD_NAME  = 'dddhsobvx';
+const UPLOAD_PRESET = 'shaimaa-portfolio';
+
 interface EduItem  { degree:string; school:string; period:string; note:string; }
 interface SkillCat { cat_en:string; cat_ar:string; items:string; }
+interface CertItem { name:string; imageUrl?:string; }
 
 const LANG = {
   en: { langBtn:'العربية', dir:'ltr',
@@ -32,10 +36,12 @@ const LANG = {
     degreeL:'Degree', schoolL:'School/University', periodL:'Period', noteL:'Note (optional)',
     addEdu:'+ Add Education', removeL:'Remove',
     certL:'Certification name (e.g. Scrum Master — IBM)',
+    certImgL:'Upload Certificate Image',
     addCert:'+ Add Certification',
     catEnL:'Category (English)', catArL:'Category (Arabic)',
     itemsL:'Skills (comma separated)', addSkill:'+ Add Skill Category',
     saving:'Saving...', save:'Save All Changes ♥', saved:'✓ Saved!',
+    uploading:'Uploading...',
   },
   ar: { langBtn:'English', dir:'rtl',
     title:'تعديل', span:'صفحة عني',
@@ -52,10 +58,12 @@ const LANG = {
     degreeL:'الدرجة العلمية', schoolL:'الجامعة/المؤسسة', periodL:'الفترة', noteL:'ملاحظة (اختياري)',
     addEdu:'+ إضافة تعليم', removeL:'حذف',
     certL:'اسم الشهادة (مثال: Scrum Master — IBM)',
+    certImgL:'رفع صورة الشهادة',
     addCert:'+ إضافة شهادة',
     catEnL:'الفئة (إنجليزي)', catArL:'الفئة (عربي)',
     itemsL:'المهارات (مفصولة بفاصلة)', addSkill:'+ إضافة فئة مهارات',
     saving:'جاري الحفظ...', save:'حفظ كل التغييرات ♥', saved:'✓ تم الحفظ!',
+    uploading:'جاري الرفع...',
   },
 };
 
@@ -66,10 +74,13 @@ const DEFAULT_EDU: EduItem[] = [
   { degree:'Software Engineering Specialization', school:'HKUST', period:'2024', note:'' },
 ];
 
-const DEFAULT_CERTS: string[] = [
-  'IT Fundamentals — IBM','UI/UX Design — IBM','Front-End Development — IBM',
-  'Intro to Software Engineering — IBM (with Honors)',
-  'Scrum Master — SKILL-UP EDTECH (with Honors)','Software Engineering — HKUST (×3)',
+const DEFAULT_CERTS: CertItem[] = [
+  { name:'IT Fundamentals — IBM' },
+  { name:'UI/UX Design — IBM' },
+  { name:'Front-End Development — IBM' },
+  { name:'Intro to Software Engineering — IBM (with Honors)' },
+  { name:'Scrum Master — SKILL-UP EDTECH (with Honors)' },
+  { name:'Software Engineering — HKUST (×3)' },
 ];
 
 const DEFAULT_SKILLS: SkillCat[] = [
@@ -77,6 +88,16 @@ const DEFAULT_SKILLS: SkillCat[] = [
   { cat_en:'Agile & Project Management', cat_ar:'Agile وإدارة المشاريع', items:'Scrum,Kanban,DSDM,Jira,Trello' },
   { cat_en:'Design & Analysis', cat_ar:'التصميم والتحليل', items:'ERD,DFD,UI/UX Design,Agile Leadership' },
 ];
+
+async function uploadToCloudinary(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:'POST', body:fd });
+  const data = await res.json();
+  if (!data.secure_url) throw new Error('Upload failed');
+  return data.secure_url;
+}
 
 export default function AdminAbout() {
   const router = useRouter();
@@ -86,11 +107,9 @@ export default function AdminAbout() {
   const [lang,     setLang]     = useState<'en'|'ar'>('en');
   const [mounted,  setMounted]  = useState(false);
 
-  // auto counts
   const [autoProjects, setAutoProjects] = useState(0);
   const [autoCerts,    setAutoCerts]    = useState(0);
 
-  // profile fields
   const [name,      setName]     = useState('Shaimaa Kalel');
   const [nameAr,    setNameAr]   = useState('شيماء خليل');
   const [titleEn,   setTitleEn]  = useState('Software Engineer · Human-Centered Agility · Content Creator');
@@ -100,16 +119,18 @@ export default function AdminAbout() {
   const [location,  setLocation] = useState('Abu Dhabi, UAE');
   const [university,setUniversity] = useState('University of Bolton');
 
-  // manual stat overrides
   const [overrideProj,  setOverrideProj]  = useState('');
   const [overrideCerts, setOverrideCerts] = useState('');
   const [statsYears,    setStatsYears]    = useState('3+');
   const [statsGrad,     setStatsGrad]     = useState('2025');
 
-  // sections
   const [edu,    setEdu]    = useState<EduItem[]>(DEFAULT_EDU);
-  const [certs,  setCerts]  = useState<string[]>(DEFAULT_CERTS);
+  const [certs,  setCerts]  = useState<CertItem[]>(DEFAULT_CERTS);
   const [skills, setSkills] = useState<SkillCat[]>(DEFAULT_SKILLS);
+
+  // track which cert is uploading
+  const [uploadingIdx, setUploadingIdx] = useState<number|null>(null);
+  const certFileRefs = useRef<(HTMLInputElement|null)[]>([]);
 
   useEffect(() => {
     const s = localStorage.getItem('lang') as 'en'|'ar';
@@ -127,14 +148,9 @@ export default function AdminAbout() {
     const unsub = onAuthStateChanged(auth, async user => {
       if (!user) { router.push('/admin/login'); return; }
 
-      // Load auto counts
-      const [projSnap, certsCount] = await Promise.all([
-        getDocs(collection(db,'projects')),
-        Promise.resolve(0), // certs come from about doc
-      ]);
+      const projSnap = await getDocs(collection(db,'projects'));
       setAutoProjects(projSnap.size);
 
-      // Load about data
       const d = await getDoc(doc(db,'about','main'));
       if (d.exists()) {
         const data = d.data();
@@ -151,7 +167,15 @@ export default function AdminAbout() {
         if (data.statsYears)   setStatsYears(data.statsYears);
         if (data.statsGrad)    setStatsGrad(data.statsGrad);
         if (data.edu?.length)    setEdu(data.edu);
-        if (data.certs?.length)  { setCerts(data.certs); setAutoCerts(data.certs.length); }
+        if (data.certs?.length) {
+          // support old format (string[]) and new format (CertItem[])
+          const raw = data.certs;
+          const normalized: CertItem[] = raw.map((c: string | CertItem) =>
+            typeof c === 'string' ? { name: c } : c
+          );
+          setCerts(normalized);
+          setAutoCerts(normalized.length);
+        }
         if (data.skills?.length) setSkills(data.skills);
       } else {
         setAutoCerts(DEFAULT_CERTS.length);
@@ -161,15 +185,27 @@ export default function AdminAbout() {
     return () => unsub();
   }, [router]);
 
-  // auto update certs count whenever certs array changes
   useEffect(() => { setAutoCerts(certs.length); }, [certs]);
+
+  async function handleCertImageUpload(idx: number, file: File) {
+    setUploadingIdx(idx);
+    try {
+      const url = await uploadToCloudinary(file);
+      const updated = [...certs];
+      updated[idx] = { ...updated[idx], imageUrl: url };
+      setCerts(updated);
+    } catch (e) {
+      alert('Upload failed. Check Cloudinary settings.');
+    } finally {
+      setUploadingIdx(null);
+    }
+  }
 
   async function handleSave() {
     setSaving(true);
     const data = {
       name, nameAr, titleEn, titleAr, bioEn, bioAr, location, university,
       overrideProj, overrideCerts, statsYears, statsGrad,
-      // computed display values (what about page reads)
       stats_projects: overrideProj  || `${autoProjects}+`,
       stats_certs:    overrideCerts || `${autoCerts}`,
       stats_years:    statsYears,
@@ -177,7 +213,6 @@ export default function AdminAbout() {
       edu, certs, skills,
     };
     await setDoc(doc(db,'about','main'), data);
-    // also update settings/main for backward compat
     await setDoc(doc(db,'settings','main'), {
       name, title:titleEn, bio:bioEn, location, university,
       stats_projects: overrideProj  || `${autoProjects}+`,
@@ -189,7 +224,6 @@ export default function AdminAbout() {
     setTimeout(()=>setSaved(false), 3000);
   }
 
-  // ── helpers ──
   const inp = (dir?:'ltr'|'rtl'): React.CSSProperties => ({
     width:'100%', padding:'.8rem 1rem', background:'rgba(255,255,255,0.04)',
     border:`1px solid ${T.border}`, borderRadius:10, color:T.text,
@@ -272,7 +306,6 @@ export default function AdminAbout() {
 
         {/* ── STATS ── */}
         {card(<>
-          {/* AUTO */}
           <div style={{background:'rgba(74,222,128,0.06)',border:`1px solid rgba(74,222,128,0.2)`,borderRadius:12,padding:'1rem 1.25rem',marginBottom:'1.5rem'}}>
             <p style={{fontSize:'.8rem',color:T.green,fontWeight:700,marginBottom:'.75rem'}}>{L.autoNote}</p>
             <div style={{display:'flex',gap:'1.5rem',flexWrap:'wrap'}}>
@@ -286,7 +319,6 @@ export default function AdminAbout() {
               </div>
             </div>
           </div>
-          {/* MANUAL OVERRIDE */}
           <p style={{fontSize:'.78rem',color:T.muted,marginBottom:'.85rem'}}>{L.manualNote}</p>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
             <div>{label(L.statsProj)}<input placeholder={`auto: ${autoProjects}+`} value={overrideProj} onChange={e=>setOverrideProj(e.target.value)} style={inp('ltr')}
@@ -330,21 +362,77 @@ export default function AdminAbout() {
           </button>
         </>, L.secEdu)}
 
-        {/* ── CERTIFICATIONS ── */}
+        {/* ── CERTIFICATIONS (with image upload) ── */}
         {card(<>
-          <div style={{display:'flex',flexDirection:'column',gap:'.6rem'}}>
+          <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
             {certs.map((c,i)=>(
-              <div key={i} style={{display:'flex',gap:'.6rem',alignItems:'center'}}>
-                <input value={c} onChange={e=>{const n=[...certs];n[i]=e.target.value;setCerts(n);}}
-                  placeholder={L.certL} style={{...inp(),flex:1}}
-                  onFocus={e=>e.target.style.borderColor=T.gold} onBlur={e=>e.target.style.borderColor=T.border}/>
-                <button onClick={()=>setCerts(certs.filter((_,j)=>j!==i))}
-                  style={{padding:'.8rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.4)`,borderRadius:8,color:T.rose,cursor:'pointer',flexShrink:0}}>✕</button>
+              <div key={i} style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${T.border}`,borderRadius:12,padding:'1rem'}}>
+                {/* Name row */}
+                <div style={{display:'flex',gap:'.6rem',alignItems:'center',marginBottom:'.75rem'}}>
+                  <input value={c.name} onChange={e=>{const n=[...certs];n[i]={...n[i],name:e.target.value};setCerts(n);}}
+                    placeholder={L.certL} style={{...inp(),flex:1}}
+                    onFocus={e=>e.target.style.borderColor=T.gold} onBlur={e=>e.target.style.borderColor=T.border}/>
+                  <button onClick={()=>setCerts(certs.filter((_,j)=>j!==i))}
+                    style={{padding:'.8rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.4)`,borderRadius:8,color:T.rose,cursor:'pointer',flexShrink:0}}>✕</button>
+                </div>
+
+                {/* Image upload row */}
+                <div style={{display:'flex',alignItems:'center',gap:'1rem',flexWrap:'wrap'}}>
+                  {/* hidden file input */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={el => { certFileRefs.current[i] = el; }}
+                    style={{display:'none'}}
+                    onChange={async e => {
+                      const file = e.target.files?.[0];
+                      if (file) await handleCertImageUpload(i, file);
+                      e.target.value = '';
+                    }}
+                  />
+
+                  {/* upload button */}
+                  <button
+                    onClick={() => certFileRefs.current[i]?.click()}
+                    disabled={uploadingIdx === i}
+                    style={{
+                      padding:'.5rem 1rem',
+                      background: c.imageUrl ? 'rgba(200,158,72,0.12)' : 'rgba(255,255,255,0.05)',
+                      border:`1px solid ${c.imageUrl ? T.gold : T.border}`,
+                      borderRadius:8, color: c.imageUrl ? T.gold : T.muted,
+                      fontSize:'.8rem', fontWeight:600, cursor:'pointer',
+                      display:'flex', alignItems:'center', gap:'.4rem',
+                      opacity: uploadingIdx === i ? 0.6 : 1,
+                    }}>
+                    {uploadingIdx === i
+                      ? `⏳ ${L.uploading}`
+                      : c.imageUrl
+                        ? '🖼 Change Image'
+                        : `📷 ${L.certImgL}`}
+                  </button>
+
+                  {/* preview thumbnail */}
+                  {c.imageUrl && (
+                    <div style={{display:'flex',alignItems:'center',gap:'.75rem'}}>
+                      <img
+                        src={c.imageUrl}
+                        alt="cert preview"
+                        style={{height:52,width:80,objectFit:'cover',borderRadius:6,border:`1px solid ${T.border}`}}
+                      />
+                      <button
+                        onClick={()=>{const n=[...certs];n[i]={...n[i],imageUrl:undefined};setCerts(n);}}
+                        style={{fontSize:'.75rem',color:T.rose,background:'none',border:'none',cursor:'pointer',padding:0}}>
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
+
           <div style={{display:'flex',alignItems:'center',gap:'1rem',marginTop:'.85rem'}}>
-            <button onClick={()=>setCerts([...certs,''])}
+            <button onClick={()=>setCerts([...certs,{name:''}])}
               style={{padding:'.65rem 1.25rem',background:'rgba(200,158,72,0.08)',border:`1px solid ${T.border}`,borderRadius:10,color:T.gold,fontSize:'.85rem',fontWeight:700,cursor:'pointer'}}>
               {L.addCert}
             </button>
