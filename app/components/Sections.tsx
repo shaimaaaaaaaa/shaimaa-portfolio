@@ -6,6 +6,99 @@ import type { Lang, LangData, Course, Article } from '../lib/constants';
 import ContactForm from './ContactForm';
 
 // ═══════════════════════════════
+//  EDUCATION
+// ═══════════════════════════════
+interface EduItem { degree:string; school:string; period:string; note:string; imageUrl?:string; }
+
+interface EducationProps { lang: Lang; }
+
+export function EducationSection({ lang }: EducationProps) {
+  const [edu, setEdu] = useState<EduItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  // lazy-load from Firebase when section mounts
+  useState(() => {
+    if (loaded) return;
+    import('../lib/firebase').then(({ db }) => {
+      import('firebase/firestore').then(({ doc, getDoc }) => {
+        getDoc(doc(db, 'about', 'main')).then(d => {
+          if (d.exists() && d.data().edu?.length) setEdu(d.data().edu);
+          setLoaded(true);
+        });
+      });
+    });
+  });
+
+  const eyebrow: React.CSSProperties = {
+    fontSize:'.72rem', letterSpacing:5, textTransform:'uppercase',
+    color:T.rose, fontFamily:'Playfair Display,serif',
+    display:'block', marginBottom:'.65rem',
+  };
+  const rule: React.CSSProperties = {
+    width:60, height:2, marginTop:'1rem',
+    background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`,
+  };
+
+  const title    = lang==='ar' ? 'التعليم'    : 'Education';
+  const span     = lang==='ar' ? 'والتدريب'   : '& Training';
+  const tag      = 'academic background';
+  const viewAll  = lang==='ar' ? 'عرض التفاصيل ←' : 'View Full Details →';
+
+  if (!loaded || edu.length === 0) return null;
+
+  return (
+    <section className="section-pad" style={{padding:'7rem 3rem',background:T.bg2}}>
+      <div style={{maxWidth:1050,margin:'0 auto'}}>
+        <div style={{marginBottom:'3rem',display:'flex',justifyContent:'space-between',alignItems:'flex-end',flexWrap:'wrap',gap:'1rem'}}>
+          <div>
+            <span style={eyebrow}>{tag}</span>
+            <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(1.8rem,4vw,2.4rem)',fontWeight:900,color:T.white}}>
+              {title} <span style={{color:T.gold,fontStyle:'italic'}}>{span}</span>
+            </h2>
+            <div style={rule}/>
+          </div>
+          <Link href="/about"
+            style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}
+            onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
+            onMouseLeave={e=>(e.currentTarget.style.color=T.gold)}>
+            {viewAll}
+          </Link>
+        </div>
+
+        <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+          {edu.map((e,i)=>(
+            <div key={i} style={{
+              background:T.card, border:`1px solid ${T.border}`,
+              borderRadius:16, padding:'1.25rem 1.5rem',
+              display:'flex', justifyContent:'space-between',
+              alignItems:'center', gap:'1rem',
+              transition:'border-color .25s',
+            }}
+              onMouseEnter={ev=>(ev.currentTarget.style.borderColor='rgba(201,160,72,0.45)')}
+              onMouseLeave={ev=>(ev.currentTarget.style.borderColor=T.border)}>
+
+              <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+                {e.imageUrl && (
+                  <img src={e.imageUrl} alt={e.school}
+                    style={{width:44,height:44,objectFit:'contain',borderRadius:8,background:'rgba(255,255,255,0.06)',padding:3,flexShrink:0}}/>
+                )}
+                <div>
+                  <div style={{fontFamily:'Playfair Display,serif',fontSize:'1rem',fontWeight:700,color:T.white,marginBottom:'.2rem',lineHeight:1.3}}>{e.degree}</div>
+                  <div style={{fontSize:'.84rem',color:T.gold,fontWeight:600,marginBottom:'.1rem'}}>{e.school}</div>
+                  {e.note && <div style={{fontSize:'.72rem',color:T.rose,letterSpacing:1}}>{e.note}</div>}
+                </div>
+              </div>
+
+              <div style={{fontSize:'.76rem',color:T.muted,flexShrink:0,whiteSpace:'nowrap'}}>{e.period}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ═══════════════════════════════
 //  COURSES
 // ═══════════════════════════════
 interface CoursesProps { L: LangData; lang: Lang; courses: Course[]; showViewAll?: boolean; }
@@ -44,7 +137,6 @@ export function CoursesSection({ L, lang, courses, showViewAll = false }: Course
               onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor='rgba(201,160,72,0.5)';el.style.transform='translateY(-5px)';}}
               onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor=T.border;el.style.transform='translateY(0)';}}>
 
-              {/* cover image OR number badge */}
               {c.imageUrl ? (
                 <div style={{width:'100%',height:140,borderRadius:10,overflow:'hidden',marginBottom:'1.1rem',border:`1px solid ${T.border}`}}>
                   <img src={c.imageUrl} alt={c.title} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
