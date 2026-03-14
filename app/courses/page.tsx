@@ -6,6 +6,7 @@ import { LANG, T } from '../lib/constants';
 import type { Lang, Course } from '../lib/constants';
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
+import SharedFooter from '../components/SharedFooter';
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -104,11 +105,8 @@ export default function CoursesPage() {
           </div>
         </div>
 
-        <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted}}>
-          Made with <span style={{color:T.gold}}>♥</span> by{' '}
-          <span style={{color:T.goldL,fontWeight:700}}>Shaimaa Kalel</span>
-          {' '}· {L.footTxt}
-        </footer>
+        <SharedFooter lang={lang} />
+        
       </main>
     </>
   );

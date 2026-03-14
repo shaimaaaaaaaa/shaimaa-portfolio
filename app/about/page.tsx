@@ -5,6 +5,7 @@ import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { LANG } from '../lib/constants';
 import type { Lang } from '../lib/constants';
 import Navbar from '../components/Navbar';
+import SharedFooter from '../components/SharedFooter';
 
 const T = {
   bg:'#0e0608', bg2:'#140a0c', card:'#1a0c10', burg:'#8a1f32', burgL:'#a02840',
@@ -296,11 +297,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted}}>
-          Made with <span style={{color:T.gold}}>♥</span> by{' '}
-          <span style={{color:T.goldL,fontWeight:700}}>Shaimaa Kalel</span>
-          {' '}· Software Engineer · Content Creator · Abu Dhabi · 2025
-        </footer>
+        <SharedFooter lang={lang} />
       </main>
     </>
   );

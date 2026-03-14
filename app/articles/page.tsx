@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import Link from 'next/link';
+import SharedFooter from '../components/SharedFooter';
 
 const T = {
   bg:'#0e0608', bg2:'#140a0c', card:'#1a0c10',
@@ -283,6 +284,7 @@ export default function ArticlesPage() {
           </div>
         </div>
       </main>
+      <SharedFooter lang={lang} />
     </>
   );
 }

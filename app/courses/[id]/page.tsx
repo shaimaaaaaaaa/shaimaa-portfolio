@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { LANG as NAV_LANG } from '../../lib/constants';
 import type { Lang } from '../../lib/constants';
 import Navbar from '../../components/Navbar';
+import SharedFooter from '../../components/SharedFooter';
 
 const T = {
   bg:'#0e0608', bg2:'#140a0c', card:'#1a0c10', burg:'#8a1f32',
@@ -246,6 +247,8 @@ export default function CoursePage() {
           )}
         </div>
       </div>
+      <SharedFooter lang={lang} />
     </main>
+    
   );
 }

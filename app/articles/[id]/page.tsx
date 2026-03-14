@@ -5,6 +5,7 @@ import { doc, getDoc, collection, addDoc, getDocs, orderBy, query, updateDoc, in
 import { LANG as NAV_LANG } from '../../lib/constants';
 import type { Lang } from '../../lib/constants';
 import Navbar from '../../components/Navbar';
+import SharedFooter from '../../components/SharedFooter';
 
 const T = {
   bg:'#0e0608', bg2:'#140a0c', card:'#1a0c10',
@@ -305,6 +306,8 @@ export default function ArticlePage({ params }:{ params: Promise<{ id:string }> 
           </div>
         </div>
       </main>
+      <SharedFooter lang={lang} />
     </>
+    
   );
 }
