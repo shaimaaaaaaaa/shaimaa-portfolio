@@ -13,10 +13,10 @@ const T = {
   border:'rgba(200,158,72,0.2)', rose:'#d07080', green:'#4ade80',
 };
 
-const CLOUD_NAME  = 'dddhsobvx';
+const CLOUD_NAME    = 'dddhsobvx';
 const UPLOAD_PRESET = 'shaimaa-portfolio';
 
-interface EduItem  { degree:string; school:string; period:string; note:string; }
+interface EduItem  { degree:string; school:string; period:string; note:string; imageUrl?:string; }
 interface SkillCat { cat_en:string; cat_ar:string; items:string; }
 interface CertItem { name:string; imageUrl?:string; }
 
@@ -34,6 +34,7 @@ const LANG = {
     statsProj:'Projects override', statsCerts:'Certs override',
     statsYears:'Years Experience', statsGrad:'Graduation Year',
     degreeL:'Degree', schoolL:'School/University', periodL:'Period', noteL:'Note (optional)',
+    eduImgL:'Upload Logo / Image',
     addEdu:'+ Add Education', removeL:'Remove',
     certL:'Certification name (e.g. Scrum Master — IBM)',
     certImgL:'Upload Certificate Image',
@@ -56,6 +57,7 @@ const LANG = {
     statsProj:'تجاوز المشاريع', statsCerts:'تجاوز الشهادات',
     statsYears:'سنوات الخبرة', statsGrad:'سنة التخرج',
     degreeL:'الدرجة العلمية', schoolL:'الجامعة/المؤسسة', periodL:'الفترة', noteL:'ملاحظة (اختياري)',
+    eduImgL:'رفع شعار / صورة',
     addEdu:'+ إضافة تعليم', removeL:'حذف',
     certL:'اسم الشهادة (مثال: Scrum Master — IBM)',
     certImgL:'رفع صورة الشهادة',
@@ -110,14 +112,14 @@ export default function AdminAbout() {
   const [autoProjects, setAutoProjects] = useState(0);
   const [autoCerts,    setAutoCerts]    = useState(0);
 
-  const [name,      setName]     = useState('Shaimaa Kalel');
-  const [nameAr,    setNameAr]   = useState('شيماء خليل');
-  const [titleEn,   setTitleEn]  = useState('Software Engineer · Human-Centered Agility · Content Creator');
-  const [titleAr,   setTitleAr]  = useState('مهندسة برمجيات · Human-Centered Agility · صانعة محتوى');
-  const [bioEn,     setBioEn]    = useState('');
-  const [bioAr,     setBioAr]    = useState('');
-  const [location,  setLocation] = useState('Abu Dhabi, UAE');
-  const [university,setUniversity] = useState('University of Bolton');
+  const [name,       setName]      = useState('Shaimaa Kalel');
+  const [nameAr,     setNameAr]    = useState('شيماء خليل');
+  const [titleEn,    setTitleEn]   = useState('Software Engineer · Human-Centered Agility · Content Creator');
+  const [titleAr,    setTitleAr]   = useState('مهندسة برمجيات · Human-Centered Agility · صانعة محتوى');
+  const [bioEn,      setBioEn]     = useState('');
+  const [bioAr,      setBioAr]     = useState('');
+  const [location,   setLocation]  = useState('Abu Dhabi, UAE');
+  const [university, setUniversity]= useState('University of Bolton');
 
   const [overrideProj,  setOverrideProj]  = useState('');
   const [overrideCerts, setOverrideCerts] = useState('');
@@ -128,8 +130,11 @@ export default function AdminAbout() {
   const [certs,  setCerts]  = useState<CertItem[]>(DEFAULT_CERTS);
   const [skills, setSkills] = useState<SkillCat[]>(DEFAULT_SKILLS);
 
-  // track which cert is uploading
-  const [uploadingIdx, setUploadingIdx] = useState<number|null>(null);
+  // uploading state — separate for edu and certs
+  const [uploadingEduIdx,  setUploadingEduIdx]  = useState<number|null>(null);
+  const [uploadingCertIdx, setUploadingCertIdx] = useState<number|null>(null);
+
+  const eduFileRefs  = useRef<(HTMLInputElement|null)[]>([]);
   const certFileRefs = useRef<(HTMLInputElement|null)[]>([]);
 
   useEffect(() => {
@@ -166,9 +171,8 @@ export default function AdminAbout() {
         if (data.overrideCerts !== undefined) setOverrideCerts(data.overrideCerts);
         if (data.statsYears)   setStatsYears(data.statsYears);
         if (data.statsGrad)    setStatsGrad(data.statsGrad);
-        if (data.edu?.length)    setEdu(data.edu);
+        if (data.edu?.length)  setEdu(data.edu);
         if (data.certs?.length) {
-          // support old format (string[]) and new format (CertItem[])
           const raw = data.certs;
           const normalized: CertItem[] = raw.map((c: string | CertItem) =>
             typeof c === 'string' ? { name: c } : c
@@ -187,17 +191,31 @@ export default function AdminAbout() {
 
   useEffect(() => { setAutoCerts(certs.length); }, [certs]);
 
+  async function handleEduImageUpload(idx: number, file: File) {
+    setUploadingEduIdx(idx);
+    try {
+      const url = await uploadToCloudinary(file);
+      const updated = [...edu];
+      updated[idx] = { ...updated[idx], imageUrl: url };
+      setEdu(updated);
+    } catch {
+      alert('Upload failed. Check Cloudinary settings.');
+    } finally {
+      setUploadingEduIdx(null);
+    }
+  }
+
   async function handleCertImageUpload(idx: number, file: File) {
-    setUploadingIdx(idx);
+    setUploadingCertIdx(idx);
     try {
       const url = await uploadToCloudinary(file);
       const updated = [...certs];
       updated[idx] = { ...updated[idx], imageUrl: url };
       setCerts(updated);
-    } catch (e) {
+    } catch {
       alert('Upload failed. Check Cloudinary settings.');
     } finally {
-      setUploadingIdx(null);
+      setUploadingCertIdx(null);
     }
   }
 
@@ -237,6 +255,47 @@ export default function AdminAbout() {
     <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,padding:'1.75rem',marginBottom:'1.25rem'}}>
       <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'1.05rem',color:T.gold,fontWeight:700,marginBottom:'1.5rem'}}>{title}</h2>
       {children}
+    </div>
+  );
+
+  // reusable image upload row
+  const ImageUploadRow = ({
+    imageUrl, isUploading, onUpload, onRemove, inputRef, label: lbl,
+  }: {
+    imageUrl?: string;
+    isUploading: boolean;
+    onUpload: (file: File) => void;
+    onRemove: () => void;
+    inputRef: (el: HTMLInputElement | null) => void;
+    label: string;
+  }) => (
+    <div style={{display:'flex',alignItems:'center',gap:'1rem',flexWrap:'wrap',marginTop:'.75rem'}}>
+      <input type="file" accept="image/*" ref={inputRef} style={{display:'none'}}
+        onChange={async e => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value=''; }}
+      />
+      <button
+        onClick={e => { e.preventDefault(); (inputRef as React.RefCallback<HTMLInputElement> & {current?:HTMLInputElement|null})}}
+        style={{
+          padding:'.45rem .9rem',
+          background: imageUrl ? 'rgba(200,158,72,0.12)' : 'rgba(255,255,255,0.05)',
+          border:`1px solid ${imageUrl ? T.gold : T.border}`,
+          borderRadius:8, color: imageUrl ? T.gold : T.muted,
+          fontSize:'.8rem', fontWeight:600, cursor:'pointer',
+          display:'flex', alignItems:'center', gap:'.4rem',
+          opacity: isUploading ? 0.6 : 1,
+        }}>
+        {isUploading ? `⏳ ${LANG['en'].uploading}` : imageUrl ? '🖼 Change Image' : `📷 ${lbl}`}
+      </button>
+      {imageUrl && (
+        <div style={{display:'flex',alignItems:'center',gap:'.75rem'}}>
+          <img src={imageUrl} alt="preview"
+            style={{height:48,width:72,objectFit:'contain',borderRadius:6,border:`1px solid ${T.border}`,background:'rgba(255,255,255,0.04)'}}/>
+          <button onClick={onRemove}
+            style={{fontSize:'.75rem',color:T.rose,background:'none',border:'none',cursor:'pointer',padding:0}}>
+            Remove
+          </button>
+        </div>
+      )}
     </div>
   );
 
@@ -332,7 +391,7 @@ export default function AdminAbout() {
           </div>
         </>, L.secStats)}
 
-        {/* ── EDUCATION ── */}
+        {/* ── EDUCATION (with image upload) ── */}
         {card(<>
           <div style={{display:'flex',flexDirection:'column',gap:'.85rem'}}>
             {edu.map((e,i)=>(
@@ -353,6 +412,48 @@ export default function AdminAbout() {
                       style={{padding:'.8rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.4)`,borderRadius:8,color:T.rose,cursor:'pointer',fontSize:'.8rem',flexShrink:0}}>✕</button>
                   </div>
                 </div>
+
+                {/* ── image upload for this edu item ── */}
+                <div style={{display:'flex',alignItems:'center',gap:'1rem',flexWrap:'wrap',marginTop:'.75rem',paddingTop:'.75rem',borderTop:`1px solid ${T.border}`}}>
+                  <input
+                    type="file" accept="image/*"
+                    ref={el => { eduFileRefs.current[i] = el; }}
+                    style={{display:'none'}}
+                    onChange={async ev => {
+                      const f = ev.target.files?.[0];
+                      if (f) await handleEduImageUpload(i, f);
+                      ev.target.value = '';
+                    }}
+                  />
+                  <button
+                    onClick={() => eduFileRefs.current[i]?.click()}
+                    disabled={uploadingEduIdx === i}
+                    style={{
+                      padding:'.45rem .9rem',
+                      background: e.imageUrl ? 'rgba(200,158,72,0.12)' : 'rgba(255,255,255,0.05)',
+                      border:`1px solid ${e.imageUrl ? T.gold : T.border}`,
+                      borderRadius:8, color: e.imageUrl ? T.gold : T.muted,
+                      fontSize:'.8rem', fontWeight:600, cursor:'pointer',
+                      display:'flex', alignItems:'center', gap:'.4rem',
+                      opacity: uploadingEduIdx === i ? 0.6 : 1,
+                    }}>
+                    {uploadingEduIdx === i
+                      ? `⏳ ${L.uploading}`
+                      : e.imageUrl ? '🖼 Change Image' : `📷 ${L.eduImgL}`}
+                  </button>
+                  {e.imageUrl && (
+                    <div style={{display:'flex',alignItems:'center',gap:'.75rem'}}>
+                      <img src={e.imageUrl} alt="edu preview"
+                        style={{height:48,width:72,objectFit:'contain',borderRadius:6,border:`1px solid ${T.border}`,background:'rgba(255,255,255,0.04)'}}/>
+                      <button
+                        onClick={()=>{const n=[...edu];n[i]={...n[i],imageUrl:undefined};setEdu(n);}}
+                        style={{fontSize:'.75rem',color:T.rose,background:'none',border:'none',cursor:'pointer',padding:0}}>
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+
               </div>
             ))}
           </div>
@@ -367,7 +468,7 @@ export default function AdminAbout() {
           <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
             {certs.map((c,i)=>(
               <div key={i} style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${T.border}`,borderRadius:12,padding:'1rem'}}>
-                {/* Name row */}
+                {/* name row */}
                 <div style={{display:'flex',gap:'.6rem',alignItems:'center',marginBottom:'.75rem'}}>
                   <input value={c.name} onChange={e=>{const n=[...certs];n[i]={...n[i],name:e.target.value};setCerts(n);}}
                     placeholder={L.certL} style={{...inp(),flex:1}}
@@ -375,13 +476,10 @@ export default function AdminAbout() {
                   <button onClick={()=>setCerts(certs.filter((_,j)=>j!==i))}
                     style={{padding:'.8rem',background:'rgba(138,31,50,0.3)',border:`1px solid rgba(138,31,50,0.4)`,borderRadius:8,color:T.rose,cursor:'pointer',flexShrink:0}}>✕</button>
                 </div>
-
-                {/* Image upload row */}
+                {/* image upload row */}
                 <div style={{display:'flex',alignItems:'center',gap:'1rem',flexWrap:'wrap'}}>
-                  {/* hidden file input */}
                   <input
-                    type="file"
-                    accept="image/*"
+                    type="file" accept="image/*"
                     ref={el => { certFileRefs.current[i] = el; }}
                     style={{display:'none'}}
                     onChange={async e => {
@@ -390,35 +488,26 @@ export default function AdminAbout() {
                       e.target.value = '';
                     }}
                   />
-
-                  {/* upload button */}
                   <button
                     onClick={() => certFileRefs.current[i]?.click()}
-                    disabled={uploadingIdx === i}
+                    disabled={uploadingCertIdx === i}
                     style={{
-                      padding:'.5rem 1rem',
+                      padding:'.45rem .9rem',
                       background: c.imageUrl ? 'rgba(200,158,72,0.12)' : 'rgba(255,255,255,0.05)',
                       border:`1px solid ${c.imageUrl ? T.gold : T.border}`,
                       borderRadius:8, color: c.imageUrl ? T.gold : T.muted,
                       fontSize:'.8rem', fontWeight:600, cursor:'pointer',
                       display:'flex', alignItems:'center', gap:'.4rem',
-                      opacity: uploadingIdx === i ? 0.6 : 1,
+                      opacity: uploadingCertIdx === i ? 0.6 : 1,
                     }}>
-                    {uploadingIdx === i
+                    {uploadingCertIdx === i
                       ? `⏳ ${L.uploading}`
-                      : c.imageUrl
-                        ? '🖼 Change Image'
-                        : `📷 ${L.certImgL}`}
+                      : c.imageUrl ? '🖼 Change Image' : `📷 ${L.certImgL}`}
                   </button>
-
-                  {/* preview thumbnail */}
                   {c.imageUrl && (
                     <div style={{display:'flex',alignItems:'center',gap:'.75rem'}}>
-                      <img
-                        src={c.imageUrl}
-                        alt="cert preview"
-                        style={{height:52,width:80,objectFit:'cover',borderRadius:6,border:`1px solid ${T.border}`}}
-                      />
+                      <img src={c.imageUrl} alt="cert preview"
+                        style={{height:52,width:80,objectFit:'cover',borderRadius:6,border:`1px solid ${T.border}`}}/>
                       <button
                         onClick={()=>{const n=[...certs];n[i]={...n[i],imageUrl:undefined};setCerts(n);}}
                         style={{fontSize:'.75rem',color:T.rose,background:'none',border:'none',cursor:'pointer',padding:0}}>
@@ -430,7 +519,6 @@ export default function AdminAbout() {
               </div>
             ))}
           </div>
-
           <div style={{display:'flex',alignItems:'center',gap:'1rem',marginTop:'.85rem'}}>
             <button onClick={()=>setCerts([...certs,{name:''}])}
               style={{padding:'.65rem 1.25rem',background:'rgba(200,158,72,0.08)',border:`1px solid ${T.border}`,borderRadius:10,color:T.gold,fontSize:'.85rem',fontWeight:700,cursor:'pointer'}}>
