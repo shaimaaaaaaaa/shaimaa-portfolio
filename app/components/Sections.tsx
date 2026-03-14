@@ -9,14 +9,12 @@ import ContactForm from './ContactForm';
 //  EDUCATION
 // ═══════════════════════════════
 interface EduItem { degree:string; school:string; period:string; note:string; imageUrl?:string; }
-
 interface EducationProps { lang: Lang; }
 
 export function EducationSection({ lang }: EducationProps) {
   const [edu, setEdu] = useState<EduItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  // lazy-load from Firebase when section mounts
   useState(() => {
     if (loaded) return;
     import('../lib/firebase').then(({ db }) => {
@@ -39,10 +37,10 @@ export function EducationSection({ lang }: EducationProps) {
     background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`,
   };
 
-  const title    = lang==='ar' ? 'التعليم'    : 'Education';
-  const span     = lang==='ar' ? 'والتدريب'   : '& Training';
-  const tag      = 'academic background';
-  const viewAll  = lang==='ar' ? 'عرض التفاصيل ←' : 'View Full Details →';
+  const title   = lang==='ar' ? 'التعليم'   : 'Education';
+  const span    = lang==='ar' ? 'والتدريب'  : '& Training';
+  const tag     = 'academic background';
+  const viewAll = lang==='ar' ? 'عرض التفاصيل ←' : 'View Full Details →';
 
   if (!loaded || edu.length === 0) return null;
 
@@ -57,26 +55,11 @@ export function EducationSection({ lang }: EducationProps) {
             </h2>
             <div style={rule}/>
           </div>
-          <Link href="/about"
-            style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}
-            onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
-            onMouseLeave={e=>(e.currentTarget.style.color=T.gold)}>
-            {viewAll}
-          </Link>
+          <Link href="/about" className="link-hover">{viewAll}</Link>
         </div>
-
         <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
           {edu.map((e,i)=>(
-            <div key={i} style={{
-              background:T.card, border:`1px solid ${T.border}`,
-              borderRadius:16, padding:'1.25rem 1.5rem',
-              display:'flex', justifyContent:'space-between',
-              alignItems:'center', gap:'1rem',
-              transition:'border-color .25s',
-            }}
-              onMouseEnter={ev=>(ev.currentTarget.style.borderColor='rgba(201,160,72,0.45)')}
-              onMouseLeave={ev=>(ev.currentTarget.style.borderColor=T.border)}>
-
+            <div key={i} className="edu-card" style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.25rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',gap:'1rem'}}>
               <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
                 {e.imageUrl && (
                   <img src={e.imageUrl} alt={e.school}
@@ -88,7 +71,6 @@ export function EducationSection({ lang }: EducationProps) {
                   {e.note && <div style={{fontSize:'.72rem',color:T.rose,letterSpacing:1}}>{e.note}</div>}
                 </div>
               </div>
-
               <div style={{fontSize:'.76rem',color:T.muted,flexShrink:0,whiteSpace:'nowrap'}}>{e.period}</div>
             </div>
           ))}
@@ -119,24 +101,13 @@ export function CoursesSection({ L, lang, courses, showViewAll = false }: Course
             </h2>
             <div style={rule}/>
           </div>
-          {showViewAll && (
-            <Link href="/courses"
-              style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}
-              onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
-              onMouseLeave={e=>(e.currentTarget.style.color=T.gold)}>
-              {viewAllLabel} →
-            </Link>
-          )}
+          {showViewAll && <Link href="/courses" className="link-hover">{viewAllLabel} →</Link>}
         </div>
-
         <div className="cards-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:'1.5rem'}}>
           {courses.length===0 && <p style={{color:T.muted,gridColumn:'1/-1',textAlign:'center',padding:'3rem'}}>{L.noCourse}</p>}
           {courses.map((c,idx) => (
-            <Link key={c.id} href={`/courses/${c.id}`}
-              style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.75rem',textDecoration:'none',display:'flex',flexDirection:'column',transition:'all .3s'}}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor='rgba(201,160,72,0.5)';el.style.transform='translateY(-5px)';}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor=T.border;el.style.transform='translateY(0)';}}>
-
+            <Link key={c.id} href={`/courses/${c.id}`} className="card-hover"
+              style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:16,padding:'1.75rem',textDecoration:'none',display:'flex',flexDirection:'column'}}>
               {c.imageUrl ? (
                 <div style={{width:'100%',height:140,borderRadius:10,overflow:'hidden',marginBottom:'1.1rem',border:`1px solid ${T.border}`}}>
                   <img src={c.imageUrl} alt={c.title} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
@@ -146,7 +117,6 @@ export function CoursesSection({ L, lang, courses, showViewAll = false }: Course
                   <span style={{fontFamily:'Playfair Display,serif',color:T.goldL,fontWeight:700,fontSize:'1rem'}}>{String(idx+1).padStart(2,'0')}</span>
                 </div>
               )}
-
               <div style={{fontFamily:'Playfair Display,serif',fontSize:'1.05rem',fontWeight:700,color:T.white,marginBottom:'.5rem',lineHeight:1.4}}>{c.title}</div>
               <div style={{fontSize:'.85rem',color:T.text2,lineHeight:1.9,flex:1,marginBottom:'1.1rem'}}>{c.desc}</div>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'.85rem',borderTop:`1px solid rgba(200,158,72,0.12)`}}>
@@ -168,7 +138,7 @@ interface ArticlesProps { L: LangData; lang: Lang; articles: Article[]; }
 
 export function ArticlesSection({ L, lang, articles }: ArticlesProps) {
   const eyebrow: React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
-  const rule: React.CSSProperties    = {width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`};
+  const rule: React.CSSProperties = {width:60,height:2,marginTop:'1rem',background:`linear-gradient(${lang==='ar'?'270deg':'90deg'},${T.gold},transparent)`};
 
   function formatDate(a: Article) {
     if (!a.createdAt?.seconds) return '';
@@ -186,20 +156,13 @@ export function ArticlesSection({ L, lang, articles }: ArticlesProps) {
             </h2>
             <div style={rule}/>
           </div>
-          <Link href="/articles"
-            style={{fontSize:'.88rem',color:T.gold,fontWeight:700,textDecoration:'none'}}
-            onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
-            onMouseLeave={e=>(e.currentTarget.style.color=T.gold)}>
-            {L.viewAll} →
-          </Link>
+          <Link href="/articles" className="link-hover">{L.viewAll} →</Link>
         </div>
         {articles.length===0 && <p style={{color:T.muted,textAlign:'center',padding:'3rem'}}>{L.noArticles}</p>}
         <div className="cards-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(290px,1fr))',gap:'1.5rem'}}>
           {articles.map(a=>(
-            <Link key={a.id} href={`/articles/${a.id}`}
-              style={{textDecoration:'none',display:'flex',flexDirection:'column',background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden',transition:'all .3s'}}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.transform='translateY(-6px)';el.style.borderColor='rgba(201,160,72,0.5)';}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.transform='translateY(0)';el.style.borderColor=T.border;}}>
+            <Link key={a.id} href={`/articles/${a.id}`} className="card-hover"
+              style={{textDecoration:'none',display:'flex',flexDirection:'column',background:T.card,border:`1px solid ${T.border}`,borderRadius:16,overflow:'hidden'}}>
               <div style={{height:120,background:`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
                 <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(${T.border} 1px,transparent 1px),linear-gradient(90deg,${T.border} 1px,transparent 1px)`,backgroundSize:'35px 35px',opacity:.3}}/>
                 <span style={{fontFamily:'Playfair Display,serif',fontSize:'1.8rem',color:'rgba(255,255,255,0.12)',fontWeight:900,position:'relative',zIndex:1}}>♥</span>
@@ -257,10 +220,8 @@ export function ContactSection({ L, lang }: ContactProps) {
         </div>
         <div className="social-grid" style={{display:'flex',justifyContent:'center',gap:'.75rem',flexWrap:'wrap',marginBottom:'2.5rem'}}>
           {social.map(([label,href]) => (
-            <a key={label} href={href} target="_blank" rel="noopener"
-              style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem 1.25rem',background:'rgba(138,31,50,0.18)',border:`1px solid ${T.border}`,borderRadius:10,color:T.text,textDecoration:'none',fontSize:'.88rem',fontWeight:600,transition:'all .25s'}}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor=T.gold;el.style.color=T.goldL;}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLAnchorElement;el.style.borderColor=T.border;el.style.color=T.text;}}>
+            <a key={label} href={href} target="_blank" rel="noopener" className="social-btn"
+              style={{display:'flex',alignItems:'center',gap:'.5rem',padding:'.7rem 1.25rem',background:'rgba(138,31,50,0.18)',border:`1px solid ${T.border}`,borderRadius:10,color:T.text,textDecoration:'none',fontSize:'.88rem',fontWeight:600}}>
               {label}
             </a>
           ))}
@@ -276,7 +237,7 @@ export function ContactSection({ L, lang }: ContactProps) {
 // ═══════════════════════════════
 interface FooterProps { L: LangData; }
 
-export function Footer({ L }: FooterProps) {
+export function Footer({ L: _L }: FooterProps) {
   const [clicks, setClicks] = useState(0);
   const [timer,  setTimer]  = useState<ReturnType<typeof setTimeout>|null>(null);
 
@@ -293,12 +254,37 @@ export function Footer({ L }: FooterProps) {
   }
 
   return (
-    <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted,lineHeight:1.8}}>
-      Made with{' '}
-      <span onClick={handleHeartClick} style={{color:T.gold,cursor:'pointer',fontSize:clicks>0?'1.1rem':'1rem',transition:'font-size .15s'}} title="">♥</span>
-      {' '}by{' '}
-      <span style={{color:T.goldL,fontWeight:700}}>Shaimaa Kalel</span>
-      {' '}· {L.footTxt}
-    </footer>
+    <>
+      <style>{`
+        .link-hover {
+          font-size:.88rem; color:#c9a048; font-weight:700;
+          text-decoration:none; transition:color .2s;
+        }
+        .link-hover:hover { color:#e2bb60; }
+
+        .card-hover {
+          transition: transform .3s, border-color .3s, box-shadow .3s;
+        }
+        .card-hover:hover {
+          transform: translateY(-5px);
+          border-color: rgba(201,160,72,0.5) !important;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .edu-card { transition: border-color .25s; }
+        .edu-card:hover { border-color: rgba(201,160,72,0.45) !important; }
+
+        .social-btn { transition: border-color .2s, color .2s; }
+        .social-btn:hover { border-color: #c9a048 !important; color: #e2bb60 !important; }
+      `}</style>
+
+      <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted,lineHeight:1.8}}>
+        Made with{' '}
+        <span onClick={handleHeartClick} style={{color:T.gold,cursor:'pointer',fontSize:clicks>0?'1.1rem':'1rem',transition:'font-size .15s'}}>♥</span>
+        {' '}by{' '}
+        <span style={{color:T.goldL,fontWeight:700}}>Shaimaa Kalel</span>
+        {' '}· Software Engineer · Content Creator · Abu Dhabi · 2026
+      </footer>
+    </>
   );
 }
