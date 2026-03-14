@@ -64,7 +64,6 @@ export default function ArticlesPage() {
 
   const L = LANG[lang];
   const filtered = filter==='all' ? articles : articles.filter(a=>a.category===filter);
-
   const eyebrow:React.CSSProperties = {fontSize:'.72rem',letterSpacing:5,textTransform:'uppercase',color:T.rose,fontFamily:'Playfair Display,serif',display:'block',marginBottom:'.65rem'};
 
   function formatDate(a:Article) {
@@ -83,6 +82,103 @@ export default function ArticlesPage() {
       <style>{`
         .art-desktop { display:flex !important; }
         .art-burger  { display:none !important; }
+
+        /* nav links */
+        .art-nav-link {
+          position:relative;
+          color:${T.text2};
+          text-decoration:none;
+          font-size:.9rem;
+          font-weight:600;
+          white-space:nowrap;
+          padding-bottom:3px;
+          transition:color .2s;
+        }
+        .art-nav-link::after {
+          content:'';
+          position:absolute;
+          bottom:0; left:0;
+          width:0; height:2px;
+          background:${T.gold};
+          border-radius:2px;
+          transition:width .25s ease;
+        }
+        .art-nav-link:hover { color:${T.goldL} !important; }
+        .art-nav-link:hover::after { width:100%; }
+
+        /* lang button */
+        .art-lang-btn {
+          padding:.4rem .95rem;
+          background:rgba(200,158,72,0.1);
+          border:1px solid ${T.border};
+          border-radius:20px;
+          color:${T.gold};
+          font-size:.82rem;
+          font-weight:700;
+          white-space:nowrap;
+          transition:background .2s, border-color .2s, color .2s, transform .15s, box-shadow .2s;
+        }
+        .art-lang-btn:hover {
+          background:${T.gold} !important;
+          border-color:${T.gold} !important;
+          color:#0e0608 !important;
+          transform:translateY(-2px);
+          box-shadow:0 6px 18px rgba(201,160,72,0.4);
+        }
+
+        /* mobile nav links */
+        .art-mobile-link {
+          color:${T.text2};
+          text-decoration:none;
+          font-size:1rem;
+          font-weight:600;
+          padding:.5rem 0;
+          border-bottom:1px solid rgba(200,158,72,0.08);
+          display:block;
+          transition:color .2s, padding-left .2s;
+        }
+        .art-mobile-link:hover {
+          color:${T.goldL} !important;
+          padding-left:.5rem;
+        }
+
+        /* article cards */
+        .art-card {
+          text-decoration:none;
+          display:flex;
+          flex-direction:column;
+          background:${T.card};
+          border:1px solid ${T.border};
+          border-radius:18px;
+          overflow:hidden;
+          transition:transform .28s, border-color .28s, box-shadow .28s;
+        }
+        .art-card:hover {
+          transform:translateY(-7px) scale(1.01);
+          border-color:${T.gold} !important;
+          box-shadow:0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,160,72,0.25);
+        }
+
+        /* filter buttons */
+        .art-filter-btn {
+          padding:.45rem 1.1rem;
+          border-radius:24px;
+          font-size:.85rem;
+          font-weight:600;
+          transition:background .18s, border-color .18s, color .18s, box-shadow .18s;
+        }
+        .art-filter-btn:not(.active):hover {
+          background:rgba(201,160,72,0.12) !important;
+          border-color:${T.gold} !important;
+          color:${T.goldL} !important;
+          box-shadow:0 0 0 2px rgba(201,160,72,0.2);
+        }
+        .art-filter-btn.active {
+          background:rgba(138,31,50,0.5) !important;
+          border-color:${T.burg} !important;
+          color:#ffffff !important;
+        }
+
         @media(max-width:768px){
           .art-desktop { display:none !important; }
           .art-burger  { display:flex !important; }
@@ -97,41 +193,36 @@ export default function ArticlesPage() {
         {/* NAV */}
         <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:1000,background:'rgba(14,6,8,0.97)',backdropFilter:'blur(32px)',borderBottom:`1px solid ${T.border}`,boxShadow:'0 2px 40px rgba(0,0,0,0.8)'}}>
           <div style={{padding:'.9rem 1.5rem',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-            <Link href="/" style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,fontWeight:700,letterSpacing:1,textDecoration:'none',flexShrink:0}}>♥ Shaimaa Kalel</Link>
+            <Link href="/" className="art-nav-link" style={{fontFamily:'Playfair Display,serif',fontSize:'1.15rem',color:T.goldL,fontWeight:700,letterSpacing:1,textDecoration:'none',flexShrink:0}}>
+              ♥ Shaimaa Kalel
+            </Link>
 
             {/* DESKTOP */}
             <div className="art-desktop" style={{gap:'1.5rem',alignItems:'center'}}>
               {L.navLinks.map(([h,l])=>(
-                <a key={h} href={h} style={{color:T.text2,textDecoration:'none',fontSize:'.9rem',fontWeight:600,whiteSpace:'nowrap',transition:'color .2s'}}
-                  onMouseEnter={e=>(e.currentTarget.style.color=T.goldL)}
-                  onMouseLeave={e=>(e.currentTarget.style.color=T.text2)}>{l}</a>
+                <a key={h} href={h} className="art-nav-link">{l}</a>
               ))}
-              <button onClick={()=>setLang(lang==='en'?'ar':'en')}
-                style={{padding:'.4rem .95rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:20,color:T.gold,fontSize:'.82rem',fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}>
+              <button className="art-lang-btn" onClick={()=>setLang(lang==='en'?'ar':'en')}>
                 {L.langBtn}
               </button>
             </div>
 
             {/* HAMBURGER */}
             <button className="art-burger" onClick={()=>setMenuOpen(!menuOpen)}
-              style={{flexDirection:'column',gap:5,background:'none',border:'none',cursor:'pointer',padding:6,flexShrink:0}}>
+              style={{flexDirection:'column',gap:5,background:'none',border:'none',padding:6,flexShrink:0}}>
               <span style={{width:22,height:2,background:menuOpen?T.goldL:T.text2,display:'block',transition:'all .3s',transform:menuOpen?'rotate(45deg) translate(5px,5px)':'none'}}/>
               <span style={{width:22,height:2,background:menuOpen?T.goldL:T.text2,display:'block',transition:'all .3s',opacity:menuOpen?0:1}}/>
               <span style={{width:22,height:2,background:menuOpen?T.goldL:T.text2,display:'block',transition:'all .3s',transform:menuOpen?'rotate(-45deg) translate(5px,-5px)':'none'}}/>
             </button>
           </div>
 
-          {/* MOBILE MENU */}
           {menuOpen && (
             <div style={{borderTop:`1px solid ${T.border}`,padding:'1rem 1.5rem 1.5rem',display:'flex',flexDirection:'column',gap:'.65rem'}}>
               {L.navLinks.map(([h,l])=>(
-                <a key={h} href={h} onClick={()=>setMenuOpen(false)}
-                  style={{color:T.text2,textDecoration:'none',fontSize:'1rem',fontWeight:600,padding:'.5rem 0',borderBottom:`1px solid rgba(200,158,72,0.08)`}}>
-                  {l}
-                </a>
+                <a key={h} href={h} className="art-mobile-link" onClick={()=>setMenuOpen(false)}>{l}</a>
               ))}
-              <button onClick={()=>{setLang(lang==='en'?'ar':'en');setMenuOpen(false);}}
-                style={{marginTop:'.5rem',padding:'.65rem',background:'rgba(200,158,72,0.1)',border:`1px solid ${T.border}`,borderRadius:10,color:T.gold,fontSize:'.9rem',fontWeight:700,cursor:'pointer'}}>
+              <button className="art-lang-btn" style={{marginTop:'.5rem',borderRadius:10,fontSize:'.9rem'}}
+                onClick={()=>{setLang(lang==='en'?'ar':'en');setMenuOpen(false);}}>
                 {L.langBtn}
               </button>
             </div>
@@ -152,19 +243,21 @@ export default function ArticlesPage() {
           <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap',marginBottom:'2.5rem'}}>
             {L.filters.map(([v,l])=>(
               <button key={v} onClick={()=>setFilter(v)}
-                style={{padding:'.45rem 1.1rem',background:filter===v?'rgba(138,31,50,0.5)':'transparent',border:`1px solid ${filter===v?T.burg:T.border}`,borderRadius:24,color:filter===v?T.white:T.text2,fontSize:'.85rem',fontWeight:600,cursor:'pointer',transition:'all .2s'}}>
+                className={`art-filter-btn${filter===v?' active':''}`}
+                style={{background:filter===v?'rgba(138,31,50,0.5)':'transparent',border:`1px solid ${filter===v?T.burg:T.border}`,color:filter===v?T.white:T.text2}}>
                 {l}
               </button>
             ))}
           </div>
 
-          {/* GRID */}
           {filtered.length===0 && (
             <div style={{textAlign:'center',padding:'5rem',color:T.muted}}>{L.noArticles}</div>
           )}
+
+          {/* GRID */}
           <div className="art-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:'1.5rem'}}>
             {filtered.map(a=>(
-              <Link key={a.id} href={`/articles/${a.id}`} style={{textDecoration:'none',display:'flex',flexDirection:'column',background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:'hidden',transition:'all .3s'}}>
+              <Link key={a.id} href={`/articles/${a.id}`} className="art-card">
                 <div style={{height:150,background:a.coverColor||`linear-gradient(135deg,${T.burg},#1a0c10)`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
                   <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(${T.border} 1px,transparent 1px),linear-gradient(90deg,${T.border} 1px,transparent 1px)`,backgroundSize:'40px 40px',opacity:.3}}/>
                   <span style={{fontFamily:'Playfair Display,serif',fontSize:'2.2rem',color:'rgba(255,255,255,0.15)',fontWeight:900,position:'relative',zIndex:1}}>♥</span>
