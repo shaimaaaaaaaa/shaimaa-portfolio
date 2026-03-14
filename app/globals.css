@@ -61,6 +61,128 @@ input[type="url"], input[type="number"], textarea {
 }
 
 /* ══════════════════════════════
+   HOVER — BUTTONS & LINKS
+══════════════════════════════ */
+
+/* nav links */
+.nav-link {
+  position: relative;
+  text-decoration: none;
+  transition: color .2s;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 0; height: 2px;
+  background: #c9a048;
+  border-radius: 2px;
+  transition: width .25s ease;
+}
+.nav-link:hover { color: #c9a048 !important; }
+.nav-link:hover::after { width: 100%; }
+
+/* primary filled buttons */
+.btn-primary {
+  transition: background .2s, transform .18s, box-shadow .2s, color .2s !important;
+}
+.btn-primary:hover {
+  background: #e2bb60 !important;
+  color: #0e0608 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 28px rgba(201,160,72,0.5) !important;
+}
+
+/* outline / ghost buttons */
+.btn-outline {
+  transition: background .2s, border-color .2s, color .2s, transform .18s, box-shadow .2s !important;
+}
+.btn-outline:hover {
+  background: rgba(201,160,72,0.12) !important;
+  border-color: #c9a048 !important;
+  color: #e2bb60 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(201,160,72,0.25) !important;
+}
+
+/* filter buttons */
+.filter-btn {
+  transition: background .18s, border-color .18s, color .18s, box-shadow .18s !important;
+}
+.filter-btn:hover {
+  background: rgba(201,160,72,0.15) !important;
+  border-color: #c9a048 !important;
+  color: #e2bb60 !important;
+  box-shadow: 0 0 0 2px rgba(201,160,72,0.2) !important;
+}
+.filter-btn.active {
+  background: #c9a048 !important;
+  border-color: #c9a048 !important;
+  color: #0e0608 !important;
+}
+
+/* view-all links */
+.link-hover {
+  font-size: .88rem;
+  color: #c9a048;
+  font-weight: 700;
+  text-decoration: none;
+  padding: .38rem .85rem;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  display: inline-block;
+  transition: color .2s, border-color .2s, background .2s, box-shadow .2s;
+}
+.link-hover:hover {
+  color: #0e0608 !important;
+  background: #c9a048;
+  border-color: #c9a048;
+  box-shadow: 0 4px 18px rgba(201,160,72,0.45);
+}
+
+/* cards */
+.card-hover {
+  transition: transform .28s, border-color .28s, box-shadow .28s !important;
+}
+.card-hover:hover {
+  transform: translateY(-7px) scale(1.01) !important;
+  border-color: #c9a048 !important;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,160,72,0.3) !important;
+}
+
+/* edu rows */
+.edu-card {
+  transition: border-color .22s, background .22s, box-shadow .22s !important;
+}
+.edu-card:hover {
+  border-color: #c9a048 !important;
+  background: rgba(201,160,72,0.07) !important;
+  box-shadow: 0 4px 24px rgba(201,160,72,0.15) !important;
+}
+
+/* social buttons */
+.social-btn {
+  transition: border-color .2s, color .2s, background .2s, transform .18s, box-shadow .2s !important;
+}
+.social-btn:hover {
+  border-color: #c9a048 !important;
+  color: #0e0608 !important;
+  background: #c9a048 !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 22px rgba(201,160,72,0.4) !important;
+}
+
+/* admin action buttons */
+.admin-btn {
+  transition: filter .18s, transform .15s, box-shadow .18s !important;
+}
+.admin-btn:hover {
+  filter: brightness(1.18) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+}
+
+/* ══════════════════════════════
    NAV
 ══════════════════════════════ */
 

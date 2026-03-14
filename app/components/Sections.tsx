@@ -256,26 +256,53 @@ export function Footer({ L: _L }: FooterProps) {
   return (
     <>
       <style>{`
+        /* ── view-all links ── */
         .link-hover {
           font-size:.88rem; color:#c9a048; font-weight:700;
-          text-decoration:none; transition:color .2s;
+          text-decoration:none;
+          padding:.38rem .85rem;
+          border:1px solid transparent;
+          border-radius:20px;
+          transition: color .2s, border-color .2s, background .2s, box-shadow .2s;
         }
-        .link-hover:hover { color:#e2bb60; }
+        .link-hover:hover {
+          color:#0e0608 !important;
+          background:#c9a048;
+          border-color:#c9a048;
+          box-shadow: 0 4px 18px rgba(201,160,72,0.45);
+        }
 
+        /* ── cards ── */
         .card-hover {
-          transition: transform .3s, border-color .3s, box-shadow .3s;
+          transition: transform .28s, border-color .28s, box-shadow .28s;
         }
         .card-hover:hover {
-          transform: translateY(-5px);
-          border-color: rgba(201,160,72,0.5) !important;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          transform: translateY(-7px) scale(1.01);
+          border-color: #c9a048 !important;
+          box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,160,72,0.3);
         }
 
-        .edu-card { transition: border-color .25s; }
-        .edu-card:hover { border-color: rgba(201,160,72,0.45) !important; }
+        /* ── edu rows ── */
+        .edu-card {
+          transition: border-color .22s, background .22s, box-shadow .22s;
+        }
+        .edu-card:hover {
+          border-color: #c9a048 !important;
+          background: rgba(201,160,72,0.07) !important;
+          box-shadow: 0 4px 24px rgba(201,160,72,0.15);
+        }
 
-        .social-btn { transition: border-color .2s, color .2s; }
-        .social-btn:hover { border-color: #c9a048 !important; color: #e2bb60 !important; }
+        /* ── social buttons ── */
+        .social-btn {
+          transition: border-color .2s, color .2s, background .2s, transform .18s, box-shadow .2s;
+        }
+        .social-btn:hover {
+          border-color: #c9a048 !important;
+          color: #0e0608 !important;
+          background: #c9a048 !important;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 22px rgba(201,160,72,0.4);
+        }
       `}</style>
 
       <footer style={{textAlign:'center',padding:'2rem 1.25rem',borderTop:`1px solid ${T.border}`,fontSize:'.8rem',color:T.muted,lineHeight:1.8}}>
